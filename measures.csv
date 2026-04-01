@@ -1,0 +1,34 @@
+id,name,cat,cost,desc,poverty,underweight,obesity,premMort,foodExpend,prodCosts,agEmploy,agWages,bioeconomy,croplandBII,hotspotBII,cropareaDiv,nitrogen,waterViol,afoluGHG,globalWarm,popularity,synergy
+LowProcessed,Reduce Ultra-Processed Food,Diets,1,Cap sugar and unhealthy fat intake at planetary health diet levels. Food processing jobs are lost.,-3,0,0,-14,-12,-116,0,0,0,0,-0.01,0,0,-5,0.1,0,-2,
+HighLegumes,Increase Legume Intake,Diets,1, ,1,0,0,-7,4,20,1,0,-3,-0.03,-0.06,0.02,-1,5,0.2,0,0,
+LowMonogastrics,Less Pork Poultry & Eggs,Diets,2,Cap pig meat poultry and egg intake at planetary health diet levels.,-7,0,0,-2,-29,-203,-28,0,3,0.1,0.07,0.03,-8,-10,-0.5,0,-4,
+LowRuminants,Less Beef & Dairy,Diets,3,Cap ruminant meat and dairy at planetary health diet recommendations.,-13,0,0,-3,-35,-199,-27,0,3,0.18,0.14,0.01,-13,-2,-2.2,-0.03,-5,
+HighVegFruitsNuts,More Vegetables & Fruits,Diets,1,Increase vegetable fruit and nut consumption to PHD levels.,3,0,0,-10,10,84,21,0,2,-0.02,-0.02,0.02,1,3,0.1,0,1,
+HalfOverweight,Reduce Overweight by 50%,Diets,1,Reduce calorie intake to halve overweight and obesity rates. Healthier diets can raise food costs.,-2,0,-244,-11,-6,-45,-4,0,-3,0.03,0.02,0,-2,-1,-0.1,0,-2,
+NoUnderweight,End Undernutrition,Diets,1,Increase calorie access to eradicate underweight globally by 2050.,1,-213,0,-7,3,21,3,0,1,0,-0.01,0,1,2,0.1,0,2,
+LowFoodWaste,Halve Food Waste,Diets,2,Cut household and retail food waste to max 20% of intake. Lower demand reduces farm employment.,-5,0,0,0,-17,-124,-12,0,-7,0.07,0.04,0.01,-6,-6,-0.5,0,-1,
+LibTrade,Liberalize Trade,Livelihoods,1,Shift trade toward cost-competitiveness but can entrench large agribusiness.,-6,0,0,0,-7,-40,-11,0,0,0.07,0.04,0.01,-1,-5,-0.5,0,-1,
+MinWage,Global Minimum Wage,Livelihoods,3,Raise agricultural wages to at least $3/hour in lower-income countries.,3,0,0,0,50,-5,-7,1.65,0,0.04,0.02,0,0,7,0,0,2,
+CapitalSubst,Labor-Capital Rebalancing,Livelihoods,2,Substitute capital with labour in overly mechanized agricultural systems.,0,0,0,0,2,25,7,0,0,-0.01,0.01,-0.01,0,-3,0.1,0,1,
+REDD,Forest Carbon Pricing (REDD+),Biosphere,2,Carbon price on deforestation to protect and regenerate forests.,10,0,0,0,13,18,0,0,0,0.18,0.18,0,1,2,-1.3,-0.01,0,
+LandConservation,30x30 Land Conservation,Biosphere,3,Protect 30% of global land area by 2030 — biodiversity hotspots first.,0,0,0,0,2,4,0,0,0,0.07,0.22,0,0,3,-0.1,0,2,
+PeatlandRewetting,Rewet Peatlands,Biosphere,1,Incentivize rewetting of drained peatlands via GHG pricing. Productive farmland is retired, carbon credit markets entrench large landowners.,0,0,0,0,2,10,0,0,0,-0.05,0.02,0,1,0,-0.7,-1,-1
+WaterConservation,Environmental Water Flows,Biosphere,2,Legally maintain minimum environmental water flows for ecosystems.,0,0,0,0,1,-2,0,0,0,0.01,0,0,0,-61,0,0,0,
+BiodivOffset,Biodiversity Offsetting,Biosphere,1,Prevent BII decline in any biome — losses must be compensated elsewhere.,2,0,0,0,3,1,-1,0,0,0.2,0.2,0.01,1,1,-0.7,-0.01,0,
+NitrogenEff,Nitrogen Use Efficiency,Agriculture,3,Improve manure application nitrification inhibitors and precision farming.,2,0,0,0,11,78,22,0,0,-0.01,-0.04,0,-28,1,-0.3,0,0,
+CropRotations,Diverse Crop Rotations,Agriculture,1,Incentivize longer more diverse crop rotations. Transition costs and yield variability raise food prices.,0,0,0,0,0,4,0,0,0,-0.06,-0.06,0.05,0,11,0.2,0.01,1,
+LandscapeHabitats,Landscape Habitats,Agriculture,1,Reserve at least 20% of cropland area for semi-natural habitats. Reduced production area raises food prices.,0,0,0,0,1,4,0,0,0,0.4,0.02,-0.01,0,0,-0.03,0,2,
+RiceMitigation,Rice Emission Mitigation,Agriculture,1,Alternate flooding direct seeding and improved residue management in rice. Less labour-intensive practices displace workers.,0,0,0,0,1,13,4,0,0,0.03,0.03,0,0,3,-0.2,0,0,
+LivestockManagement,Livestock Productivity,Agriculture,2,Improve feed efficiency in ruminant systems in low-income countries. Industrial livestock producers consolidate market power.,7,0,0,0,21,197,47,0,0,-0.13,-0.01,-0.02,0,5,-0.9,-0.01,0,
+ManureManagement,Manure Management,Agriculture,2,Anaerobic digesters for 50% of confined livestock manure. Infrastructure costs are passed on through food prices.,1,0,0,0,4,38,10,0,0,0.02,0.01,0,-2,2,-0.1,0,0,
+SoilCarbon,Soil Carbon Sequestration,Agriculture,2,Carbon pricing to incentivize soil carbon storage. Carbon markets benefit large landowners and consolidate agribusiness power.,5,0,0,0,7,8,-1,0,0,0.05,0.2,-0.02,1,12,-1.4,-0.01,0,
+Population,Sustainable Demographic Transition,Cross-Sector,4,Education and development to slow population growth to 8.9 bn by 2050. Demographic transition shrinks rural labour supply.,1,-11,-5,8,2,-60,-9,0,-4,0.06,0.02,0.01,-3,-3,-0.5,0,0,
+HumanDevelop,Equitable Human Development,Cross-Sector,4,Faster more equitable growth, better institutions reduce industry capture.,-202,-28,57,-46,1,59,-43,0.63,-1,-0.08,-0.12,0.01,-8,-7,0.7,5,2
+EnergyTrans,Energy Transition,Cross-Sector,4,Transform energy industry and transport to stay within 1.5°C budget. Higher energy costs raise food production and transport costs.,-1,0,0,0,1,146,19,0,81,0,-0.03,-0.03,6,19,0.1,-0.1,-1,
+Bioplastics,Bioplastics,Cross-Sector,2,Use agricultural feedstocks to replace fossil-based plastics and packaging. Biorefinery crops require extra nitrogen inputs and new agro-industrial interests emerge.,-1,0,0,0,0,26,3,0,17,-0.01,-0.01,0,2,5,0.2,0,0,
+TimberCities,Timber Cities,Cross-Sector,3,Mass timber construction sequesters carbon in buildings replacing concrete and steel. Rapid expansion of forestry plantations threatens natural habitats and benefits large timber interests.,0,0,0,0,0,26,0,0,21,-0.02,-0.03,0,0,2,-0.2,0,0,
+SynDiets,Diet Package Synergy,Synergy,0,Co-benefits of a comprehensive diet shift: interacting demand changes reinforce each other beyond individual measures.,0,-4,-3,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,Diets=4
+SynBiosphere,Biosphere Package Synergy,Synergy,0,Nature fully protected: landscape connectivity and reduced fragmentation amplify biodiversity gains.,0,0,0,0,0,0,0,0,2,0.08,0.08,0.05,0,0,0,0,0,Biosphere=3
+SynAgriculture,Agriculture Package Synergy,Synergy,0,Farming in ecological balance: combined precision farming and habitat measures cut nitrogen and water pressure.,0,0,0,0,0,0,0,0,0,0,0,0,-5,-3,0,0,0,Agriculture=4
+SynCrossSector,Cross-Sector Synergy,Synergy,0,System-wide transformation: energy and demographic transitions reduce food-system emissions and industry capture.,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-3,-1,0,Cross-Sector=2
+SynFull,Full Integration Synergy,Synergy,0,All packages combined: co-benefits amplify across demand supply biosphere and governance dimensions.,0,-3,-2,-1,-2,0,0,0,0,0.05,0.05,0,-3,0,-2,-0.5,0,"Diets=1,Biosphere=1,Agriculture=1,Livelihoods=1,Cross-Sector=1"

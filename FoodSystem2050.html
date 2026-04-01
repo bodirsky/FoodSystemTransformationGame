@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodSystem2050 – The Food Policy Game</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh;overflow-x:hidden}
+.screen{display:none}
+.screen.active{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0d1117}
+::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px}
+
+/* ── INTRO ── */
+#screen-intro{align-items:center;justify-content:center;text-align:center;padding:40px 20px;
+  background:radial-gradient(ellipse at 50% 30%,#0d2b1a 0%,#0d1117 65%);min-height:100vh}
+#screen-intro h1{font-size:2.8em;color:#58d68d;margin-bottom:6px;letter-spacing:-1px;
+  text-shadow:0 0 40px rgba(88,214,141,.35)}
+.intro-subtitle{font-size:1.1em;color:#8b9e7a;margin-bottom:28px}
+.intro-body{max-width:680px;line-height:1.7;color:#adbac7;margin-bottom:28px;font-size:.95em}
+.intro-features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:800px;margin:0 auto 32px}
+.feat{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:14px 12px;text-align:left}
+.feat-icon{font-size:1.6em;margin-bottom:6px}
+.feat-title{font-size:.82em;font-weight:700;color:#c9d1d9;margin-bottom:3px}
+.feat-desc{font-size:.75em;color:#8b949e;line-height:1.3}
+.intro-cite{font-size:.75em;color:#8b949e;margin-top:20px;font-style:italic}
+
+/* ── BUTTONS ── */
+.btn-primary{background:#238636;color:#fff;border:none;padding:13px 38px;
+  font-size:1.05em;border-radius:8px;cursor:pointer;transition:background .2s,transform .1s;font-weight:600}
+.btn-primary:hover{background:#2ea043;transform:translateY(-1px)}
+.btn-secondary{background:#21262d;color:#c9d1d9;border:1px solid #30363d;padding:11px 28px;
+  font-size:.95em;border-radius:8px;cursor:pointer;transition:background .2s}
+.btn-secondary:hover{background:#2d333b}
+
+/* ── GAME HEADER ── */
+#game-header{position:fixed;top:0;left:0;right:0;background:#161b22;
+  border-bottom:1px solid #30363d;padding:10px 18px;display:flex;align-items:center;
+  gap:20px;z-index:200;height:56px}
+#game-header .title{color:#58d68d;font-weight:700;font-size:1em;flex:1;white-space:nowrap}
+.hstat{text-align:center;min-width:70px}
+.hstat .lbl{font-size:.68em;color:#8b949e;display:block;text-transform:uppercase;letter-spacing:.5px}
+.hstat .val{font-size:1.25em;font-weight:700}
+#h-year .val{color:#58a6ff}
+#h-round .val{color:#bc8cff}
+#h-budget .val{color:#f0b429}
+.round-dots{display:flex;gap:5px;align-items:center}
+.rdot{width:9px;height:9px;border-radius:50%;background:#21262d;border:2px solid #30363d;transition:all .3s}
+.rdot.done{background:#388bfd;border-color:#388bfd}
+.rdot.current{background:#58d68d;border-color:#58d68d;box-shadow:0 0 6px rgba(88,214,141,.5)}
+
+/* ── GAME BODY ── */
+#screen-game{flex-direction:column;height:100vh;overflow:hidden}
+#game-body{display:flex;flex:1;margin-top:56px;height:calc(100vh - 56px)}
+#left-panel{flex:0 0 55%;padding:16px;overflow-y:auto;border-right:1px solid #30363d}
+#right-panel{flex:0 0 45%;display:flex;flex-direction:column;overflow:hidden}
+#measures-scroll{flex:1;overflow-y:auto;padding:12px 12px 80px}
+#end-round-bar{position:fixed;bottom:0;right:0;width:45%;padding:10px 12px;
+  background:#0d1117;border-top:1px solid #30363d;z-index:100}
+.btn-end-round{width:100%;background:#1f6feb;color:#fff;border:none;padding:11px;
+  font-size:.95em;border-radius:7px;cursor:pointer;font-weight:600;transition:background .2s}
+.btn-end-round:hover{background:#388bfd}
+.btn-end-round:disabled{background:#21262d;color:#8b949e;cursor:not-allowed}
+
+/* ── PANEL HEADERS ── */
+.panel-head{color:#8b949e;font-size:.78em;text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* ── INDICATOR CHARTS ── */
+#indicators-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.gauge-card{background:#161b22;border:1px solid #30363d;border-radius:9px;
+  padding:8px 10px 6px;transition:border-color .25s,box-shadow .25s;cursor:default}
+.gauge-card.hi{border-color:#58d68d;box-shadow:0 0 8px rgba(88,214,141,.18)}
+.gauge-card.lo{border-color:#f85149;box-shadow:0 0 8px rgba(248,81,73,.18)}
+.chart-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.g-name{font-size:.78em;font-weight:600;color:#c9d1d9;line-height:1.2}
+.g-value{font-size:.92em;font-weight:700}
+.trend-up{color:#58d68d}.trend-dn{color:#f85149}.trend-nc{color:#8b949e}
+
+/* ── POPULARITY CHART ── */
+#pop-chart-box{margin-top:12px;background:#161b22;border:1px solid #30363d;
+  border-radius:9px;padding:11px 14px}
+#pop-chart-box h4{font-size:.75em;text-transform:uppercase;letter-spacing:.8px;
+  color:#8b949e;margin-bottom:8px}
+
+/* ── SYNERGY PANEL ── */
+#synergy-box{margin-top:12px;background:#161b22;border:1px solid #30363d;
+  border-radius:9px;padding:11px 14px}
+#synergy-box h4{font-size:.75em;text-transform:uppercase;letter-spacing:.8px;
+  color:#8b949e;margin-bottom:8px}
+.syn-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:.82em}
+.syn-badge{padding:2px 8px;border-radius:4px;font-size:.75em;font-weight:700;
+  border:1px solid}
+.syn-on{color:#58d68d;background:rgba(88,214,141,.12);border-color:rgba(88,214,141,.35)}
+.syn-off{color:#484f58;background:rgba(72,79,88,.1);border-color:rgba(72,79,88,.3)}
+.syn-desc{color:#8b949e;font-size:.95em}
+
+/* ── MEASURE CARDS ── */
+.cat-section{margin-bottom:10px}
+.cat-head{display:flex;align-items:center;gap:7px;padding:8px 10px;
+  background:#161b22;border:1px solid #30363d;border-radius:7px 7px 0 0;
+  cursor:pointer;user-select:none;transition:background .15s}
+.cat-head:hover{background:#1c2128}
+.cat-icon{font-size:1.1em}
+.cat-name{font-weight:700;font-size:.9em}
+.cat-cost{margin-left:auto;font-size:.75em;color:#8b949e}
+.cat-body{border:1px solid #30363d;border-top:none;border-radius:0 0 7px 7px;
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#30363d;overflow:hidden}
+.cat-body.collapsed{display:none}
+.mcard{padding:9px 11px;cursor:pointer;background:#0d1117;
+  transition:background .15s;position:relative;user-select:none}
+.mcard:hover:not(.mbusy){background:#1c2128}
+.mcard.msel{background:rgba(88,214,141,.08);border-left:3px solid #a5f3a5}
+.mcard.mprior{border-left:3px solid #444c56}
+.mcard.mbusy{opacity:.35;cursor:not-allowed}
+.mhead{display:flex;align-items:flex-start;gap:7px}
+.mname{font-size:.87em;font-weight:700;flex:1}
+.mcost-row{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.mcost{background:#30363d;color:#f0b429;border-radius:4px;padding:1px 6px;
+  font-size:.75em;white-space:nowrap}
+.mcost.sel{background:rgba(88,214,141,.2);color:#58d68d}
+.sel-count{background:#388bfd;color:#fff;border-radius:4px;padding:1px 5px;
+  font-size:.72em;font-weight:700}
+.prior-badge{background:#444c56;color:#adbac7;border-radius:4px;padding:1px 5px;
+  font-size:.68em;font-weight:700}
+.add-purchase{background:#1f6feb;color:#fff;border-radius:4px;padding:0 6px;
+  font-size:.8em;font-weight:700;cursor:pointer;line-height:1.4}
+.add-purchase:hover{background:#388bfd}
+.vi-penalty{color:#f85149;font-size:.85em;font-weight:700}
+.repeat-note{color:#8b949e;font-size:.8em}
+.mdesc{font-size:.75em;color:#8b949e;margin-top:3px;line-height:1.3}
+.mfx{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.chip{font-size:.68em;padding:1px 5px;border-radius:3px;font-weight:700;border:1px solid}
+.chip-p{color:#58d68d;background:rgba(88,214,141,.12);border-color:rgba(88,214,141,.3)}
+.chip-n{color:#f85149;background:rgba(248,81,73,.12);border-color:rgba(248,81,73,.3)}
+
+/* ── RESULT SCREEN ── */
+#screen-result{align-items:center;justify-content:center;padding:30px 20px;background:#0d1117}
+.result-box{max-width:680px;width:100%;animation:fadeUp .3s ease}
+.result-year{font-size:1.8em;color:#58a6ff;font-weight:700;margin-bottom:4px}
+.result-subtitle{color:#8b949e;margin-bottom:18px;font-size:.9em}
+.narrative-box{background:#161b22;border:1px solid #30363d;border-radius:9px;
+  padding:14px 16px;margin-bottom:18px;line-height:1.65;color:#adbac7;font-size:.9em}
+.changes-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.chg-item{background:#161b22;border:1px solid #30363d;border-radius:8px;
+  padding:10px 12px;display:flex;align-items:center;gap:9px}
+.chg-name{font-size:.82em;font-weight:700;flex:1}
+.chg-delta{font-size:.95em;font-weight:700}
+.delta-p{color:#58d68d}.delta-n{color:#f85149}.delta-0{color:#8b949e}
+.measures-taken{background:#161b22;border:1px solid #30363d;border-radius:9px;
+  padding:12px 14px;margin-bottom:18px}
+.measures-taken h4{font-size:.78em;text-transform:uppercase;color:#8b949e;
+  letter-spacing:.8px;margin-bottom:8px}
+.taken-list{display:flex;flex-wrap:wrap;gap:5px}
+.taken-pill{background:rgba(88,214,141,.1);border:1px solid rgba(88,214,141,.3);
+  color:#58d68d;border-radius:5px;padding:3px 9px;font-size:.78em}
+.no-measures{color:#8b949e;font-size:.85em;font-style:italic}
+
+/* ── WILDCARD EVENTS ── */
+.wildcard-box{background:#161b22;border:1px solid #4a3567;border-radius:9px;
+  padding:12px 14px;margin-bottom:18px}
+.wildcard-box h4{font-size:.78em;text-transform:uppercase;color:#bc8cff;
+  letter-spacing:.8px;margin-bottom:8px}
+.wc-item{background:#1a1535;border:1px solid #4a3567;border-radius:7px;
+  padding:9px 11px;margin-bottom:6px}
+.wc-item:last-child{margin-bottom:0}
+.wc-name{font-size:.87em;font-weight:700;color:#c9d1d9}
+.wc-desc{font-size:.75em;color:#8b949e;margin:3px 0 5px;line-height:1.3}
+
+/* ── POPULARITY ── */
+/* header widget */
+.pop-header-widget{display:flex;flex-direction:column;align-items:center;min-width:120px}
+.pop-header-widget .lbl{font-size:.68em;color:#8b949e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.pop-header-num-row{display:flex;align-items:center;gap:6px}
+.pop-header-num{font-size:1.15em;font-weight:700}
+.pop-header-mandate{font-size:.68em;font-weight:600}
+.pop-mini-track{width:90px;height:5px;background:#21262d;border-radius:3px;overflow:hidden;margin-top:2px}
+.pop-mini-fill{height:100%;border-radius:3px;transition:width .5s ease,background .5s ease}
+/* popularity chip on measure cards */
+.pop-chip{font-size:.68em;padding:1px 5px;border-radius:3px;font-weight:700;border:1px solid;white-space:nowrap}
+.pop-chip-p{color:#a5f3a5;background:rgba(165,243,165,.1);border-color:rgba(165,243,165,.3)}
+.pop-chip-n{color:#fca5a5;background:rgba(252,165,165,.1);border-color:rgba(252,165,165,.3)}
+.pop-chip-0{color:#8b949e;background:rgba(139,148,158,.1);border-color:rgba(139,148,158,.3)}
+/* end-round forecast bar */
+.forecast-row{font-size:.75em;color:#8b949e;text-align:center;padding:5px 2px 0;
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px}
+.forecast-pop-p{color:#58d68d;font-weight:700}.forecast-pop-n{color:#f85149;font-weight:700}
+.forecast-pop-0{color:#8b949e;font-weight:700}
+/* result screen popularity section */
+.pop-section{background:#161b22;border:1px solid #30363d;border-radius:9px;
+  padding:14px 16px;margin-bottom:16px}
+.pop-section-title{font-size:.78em;text-transform:uppercase;letter-spacing:.8px;
+  color:#8b949e;margin-bottom:10px}
+.pop-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.pop-bar-lbl{font-size:.76em;color:#8b949e;width:46px;text-align:right;flex-shrink:0}
+.pop-bar-track{flex:1;height:9px;background:#21262d;border-radius:5px;overflow:hidden}
+.pop-bar-fill{height:100%;border-radius:5px;transition:width .6s ease}
+.pop-bar-val{font-size:.86em;font-weight:700;width:32px;flex-shrink:0}
+.pop-delta-summary{display:flex;align-items:center;gap:8px;margin:8px 0;
+  padding:6px 10px;background:#0d1117;border-radius:6px}
+.pop-delta-lbl{font-size:.8em;color:#8b949e;flex:1}
+.pop-delta-num{font-size:1em;font-weight:700}
+.pop-comp-section{margin-top:10px;border-top:1px solid #21262d;padding-top:10px}
+.pop-comp-title{font-size:.72em;color:#8b949e;text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:6px}
+.pop-comp-row{display:flex;align-items:flex-start;gap:7px;margin-bottom:5px;font-size:.82em}
+.pop-comp-icon{width:18px;flex-shrink:0;margin-top:1px}
+.pop-comp-label{flex:1;color:#c9d1d9;line-height:1.3}
+.pop-comp-sub{color:#8b949e;font-size:.88em;display:block}
+.pop-comp-val{font-weight:700;width:46px;text-align:right;flex-shrink:0}
+.pop-forecast-row{margin-top:10px;display:flex;align-items:center;gap:8px;
+  padding:8px 11px;border-radius:7px;font-size:.84em;
+  background:rgba(88,214,141,.07);border:1px solid rgba(88,214,141,.2)}
+.pop-forecast-mandate{font-weight:700}
+.pop-forecast-budget{font-weight:700;margin-left:auto;color:#f0b429;font-size:.95em}
+
+/* ── FINAL SCREEN ── */
+#screen-final{align-items:center;justify-content:center;padding:30px 20px;
+  background:radial-gradient(ellipse at 50% 40%,#0d2b1a 0%,#0d1117 65%);min-height:100vh}
+.final-box{max-width:760px;width:100%;text-align:center;animation:fadeUp .4s ease}
+.final-title{font-size:2.4em;font-weight:700;margin-bottom:6px}
+.final-sub{color:#8b949e;margin-bottom:22px;font-size:.95em}
+.score-ring{display:inline-flex;flex-direction:column;align-items:center;
+  justify-content:center;width:140px;height:140px;border-radius:50%;
+  border:4px solid;margin-bottom:16px}
+.score-num{font-size:3em;font-weight:700;line-height:1}
+.score-lbl{font-size:.75em;color:#8b949e;margin-top:2px}
+.grade-tag{display:inline-block;padding:6px 20px;border-radius:6px;
+  font-size:1.1em;font-weight:700;margin-bottom:24px;border:1px solid}
+.grade-S{color:#58d68d;background:rgba(88,214,141,.12);border-color:rgba(88,214,141,.4)}
+.grade-A{color:#58d68d;background:rgba(88,214,141,.12);border-color:rgba(88,214,141,.4)}
+.grade-B{color:#f0b429;background:rgba(240,180,41,.1);border-color:rgba(240,180,41,.4)}
+.grade-C{color:#f85149;background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.35)}
+.grade-D{color:#f85149;background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.35)}
+.final-indicators{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:22px}
+.fi-card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:10px 6px;text-align:center}
+.fi-emoji{font-size:1.3em}
+.fi-name{font-size:.7em;color:#8b949e;margin:2px 0}
+.fi-val{font-size:1.1em;font-weight:700}
+.fi-green{color:#58d68d}.fi-yellow{color:#f0b429}.fi-red{color:#f85149}
+.final-msg{background:#161b22;border:1px solid #30363d;border-radius:9px;
+  padding:14px 18px;text-align:left;line-height:1.65;color:#adbac7;
+  font-size:.9em;margin-bottom:22px}
+.final-ref{font-size:.75em;color:#484f58;font-style:italic;margin-bottom:18px}
+.final-btns{display:flex;gap:12px;justify-content:center}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TUTORIAL ── */
+#tutorial-overlay{position:fixed;inset:0;z-index:9000;pointer-events:all;display:none}
+#tut-spotlight{position:fixed;border-radius:8px;
+  box-shadow:0 0 0 9999px rgba(13,17,23,.80);
+  border:2px solid rgba(56,139,253,.45);
+  transition:left .35s ease,top .35s ease,width .35s ease,height .35s ease;
+  pointer-events:none;z-index:9001}
+#tut-tip{position:fixed;background:#1c2128;border:1px solid #388bfd;
+  border-radius:10px;padding:16px 18px;width:290px;
+  box-shadow:0 8px 32px rgba(0,0,0,.65);z-index:9002;
+  transition:left .35s ease,top .35s ease}
+.tut-title{font-weight:700;font-size:.96em;color:#c9d1d9;margin-bottom:7px}
+.tut-body{font-size:.82em;color:#adbac7;line-height:1.6;margin-bottom:13px}
+.tut-footer{display:flex;align-items:center;justify-content:space-between}
+.tut-counter{font-size:.72em;color:#8b949e}
+.tut-btns{display:flex;gap:8px}
+.tut-skip{background:none;border:1px solid #30363d;color:#8b949e;
+  padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.8em;transition:background .15s}
+.tut-skip:hover{background:#21262d;color:#c9d1d9}
+.tut-next{background:#1f6feb;color:#fff;border:none;
+  padding:5px 14px;border-radius:6px;cursor:pointer;font-size:.8em;font-weight:600;transition:background .15s}
+.tut-next:hover{background:#388bfd}
+
+/* ── TOOLTIP ── */
+.tip{position:relative}
+.tip-text{display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+  background:#1c2128;border:1px solid #30363d;border-radius:6px;padding:6px 10px;
+  font-size:.75em;white-space:nowrap;z-index:300;pointer-events:none;color:#adbac7}
+.tip:hover .tip-text{display:block}
+
+@media(max-width:900px){
+  .intro-features{grid-template-columns:1fr 1fr}
+  #game-body{flex-direction:column}
+  #left-panel,#right-panel{flex:none;width:100%;border-right:none}
+  #indicators-grid{grid-template-columns:repeat(2,1fr)}
+  #end-round-bar{position:fixed;width:100%;bottom:0;left:0;right:0}
+}
+
+/* ── SSP SELECTION ── */
+#screen-ssp{align-items:center;justify-content:center;text-align:center;padding:40px 20px;
+  background:radial-gradient(ellipse at 50% 30%,#0d1f2b 0%,#0d1117 65%);min-height:100vh}
+#screen-ssp h2{font-size:2em;color:#58a6ff;margin-bottom:6px;font-weight:700}
+.ssp-subtitle{font-size:.95em;color:#8b949e;margin-bottom:32px}
+.ssp-cards{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;max-width:860px;margin:0 auto 28px}
+.ssp-card{flex:1;min-width:220px;max-width:260px;background:#161b22;border:2px solid #30363d;
+  border-radius:12px;padding:22px 18px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .15s;text-align:left}
+.ssp-card:hover{transform:translateY(-3px)}
+.ssp-card.ssp-easy:hover{border-color:#58d68d;box-shadow:0 0 18px rgba(88,214,141,.25)}
+.ssp-card.ssp-medium:hover{border-color:#f0b429;box-shadow:0 0 18px rgba(240,180,41,.25)}
+.ssp-card.ssp-hard:hover{border-color:#f85149;box-shadow:0 0 18px rgba(248,81,73,.25)}
+.ssp-card.selected{transform:translateY(-3px)}
+.ssp-card.ssp-easy.selected{border-color:#58d68d;box-shadow:0 0 18px rgba(88,214,141,.3)}
+.ssp-card.ssp-medium.selected{border-color:#f0b429;box-shadow:0 0 18px rgba(240,180,41,.3)}
+.ssp-card.ssp-hard.selected{border-color:#f85149;box-shadow:0 0 18px rgba(248,81,73,.3)}
+.ssp-badge{display:inline-block;font-size:.72em;font-weight:700;padding:3px 9px;border-radius:5px;
+  margin-bottom:10px;letter-spacing:.5px}
+.ssp-easy .ssp-badge{background:rgba(88,214,141,.15);color:#58d68d;border:1px solid rgba(88,214,141,.4)}
+.ssp-medium .ssp-badge{background:rgba(240,180,41,.15);color:#f0b429;border:1px solid rgba(240,180,41,.4)}
+.ssp-hard .ssp-badge{background:rgba(248,81,73,.13);color:#f85149;border:1px solid rgba(248,81,73,.4)}
+.ssp-title{font-size:1.1em;font-weight:700;color:#c9d1d9;margin-bottom:6px}
+.ssp-desc{font-size:.8em;color:#8b949e;line-height:1.5;margin-bottom:12px}
+.ssp-trends{font-size:.75em;line-height:1.6;color:#8b949e}
+.ssp-trends span{display:block}
+.ssp-trend-g{color:#58d68d}.ssp-trend-y{color:#f0b429}.ssp-trend-r{color:#f85149}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ INTRO ═══════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <h1>FoodSystem2050</h1>
+  <div class="intro-subtitle">Can you transform the global food system by 2050?</div>
+  <div class="intro-body">
+    You are a global food policy coordinator. It is 2025. The food system is failing:
+    hunger persists, obesity is rising, biodiversity is collapsing, and agriculture
+    contributes a third of all greenhouse gas emissions. Over <strong>6 rounds</strong> (each
+    representing 5 years), you implement 23 food system measures drawn from cutting-edge research.
+    Every measure has trade-offs — and your <strong>political popularity</strong> determines
+    how many policy points you receive each round. Voters reward visible improvements and
+    punish crises, so you must balance long-term sustainability with near-term approval.
+  </div>
+  <div class="intro-features" style="grid-template-columns:repeat(5,1fr)">
+    <div class="feat"><div class="feat-icon">🍽️</div>
+      <div class="feat-title">Health</div>
+      <div class="feat-desc">Fight hunger AND reduce obesity simultaneously</div></div>
+    <div class="feat"><div class="feat-icon">🌿</div>
+      <div class="feat-title">Environment</div>
+      <div class="feat-desc">Protect biodiversity, climate, water &amp; nitrogen</div></div>
+    <div class="feat"><div class="feat-icon">💰</div>
+      <div class="feat-title">Inclusion</div>
+      <div class="feat-desc">Keep food affordable; improve farm livelihoods</div></div>
+    <div class="feat"><div class="feat-icon">⚖️</div>
+      <div class="feat-title">Trade-offs</div>
+      <div class="feat-desc">No single measure fixes everything — packaging matters</div></div>
+    <div class="feat"><div class="feat-icon">👥</div>
+      <div class="feat-title">Popularity</div>
+      <div class="feat-desc">Budget = mandate. Crises drain approval; progress earns it. Voters judge your policies directly.</div></div>
+  </div>
+  <div id="load-overlay" style="margin-bottom:12px;color:#8b949e;font-size:.88em">⏳ Loading game data…</div>
+  <div id="load-error" style="display:none;color:#f85149;font-size:.85em;margin-bottom:12px;max-width:520px"></div>
+  <button class="btn-primary" onclick="startGame()">Start Game →</button>
+  <div class="intro-cite">
+    Based on: Bodirsky et al. (2025) "A food system transformation pathway reconciles
+    1.5°C global warming with improved health, environment and social inclusion." <em>Nature Food</em>.
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SSP SELECTION ═══════════════════════════ -->
+<div id="screen-ssp" class="screen">
+  <h2>Choose Your Challenge</h2>
+  <div class="ssp-subtitle">The baseline trajectory depends on the socioeconomic pathway the world follows.<br>Which scenario will you try to steer from?</div>
+  <div class="ssp-cards">
+
+    <div class="ssp-card ssp-easy" onclick="selectSSP(1)">
+      <div class="ssp-badge">SSP1 · EASY</div>
+      <div class="ssp-title">Sustainability</div>
+      <div class="ssp-desc">A world of low challenges and high cooperation. Poverty and hunger are already declining. Climate policy is advancing. Your reforms build on a benign baseline.</div>
+      <div class="ssp-trends">
+        <span class="ssp-trend-g">↓ Poverty −311 m/round</span>
+        <span class="ssp-trend-g">↓ Hunger −33 m/round</span>
+        <span class="ssp-trend-g">↓ AFOLU GHG −0.85 GtCO₂/round</span>
+        <span class="ssp-trend-y">↑ Obesity +127 m/round</span>
+        <span class="ssp-trend-g">↑ Wages +0.74 USD/round</span>
+      </div>
+    </div>
+
+    <div class="ssp-card ssp-medium" onclick="selectSSP(2)">
+      <div class="ssp-badge">SSP2 · MEDIUM</div>
+      <div class="ssp-title">Middle of the Road</div>
+      <div class="ssp-desc">Trends follow historical patterns. Some progress on development, but nitrogen and food costs keep rising. A balanced but demanding baseline.</div>
+      <div class="ssp-trends">
+        <span class="ssp-trend-g">↓ Poverty −209 m/round</span>
+        <span class="ssp-trend-g">↓ Hunger −15 m/round</span>
+        <span class="ssp-trend-r">↑ Nitrogen +9.7 Mt/round</span>
+        <span class="ssp-trend-y">↑ Obesity +102 m/round</span>
+        <span class="ssp-trend-g">↑ Wages +0.43 USD/round</span>
+      </div>
+    </div>
+
+    <div class="ssp-card ssp-hard" onclick="selectSSP(3)">
+      <div class="ssp-badge">SSP3 · HARD</div>
+      <div class="ssp-title">Regional Rivalry</div>
+      <div class="ssp-desc">Fragmented governance, rising nationalism, stalled development. Poverty barely falls; nitrogen and warming accelerate. Every reform faces fierce opposition.</div>
+      <div class="ssp-trends">
+        <span class="ssp-trend-r">↑ Poverty +13 m/round</span>
+        <span class="ssp-trend-r">↑ Hunger +17 m/round</span>
+        <span class="ssp-trend-r">↑ Nitrogen +18.3 Mt/round</span>
+        <span class="ssp-trend-r">↑ Warming +0.21 °C/round</span>
+        <span class="ssp-trend-r">↑ Wages only +0.21 USD/round</span>
+      </div>
+    </div>
+
+  </div>
+  <button class="btn-secondary" onclick="setScreen('screen-intro')">← Back</button>
+</div>
+
+<!-- ═══════════════════════════ GAME ═══════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div id="game-header">
+    <div class="title">🌍 FoodSystem2050</div>
+    <div class="hstat tip" id="h-year">
+      <span class="lbl">Year</span>
+      <span class="val" id="h-year-val">2025</span>
+      <span class="tip-text">Current simulation year</span>
+    </div>
+    <div class="hstat" id="h-round">
+      <span class="lbl">Round</span>
+      <span class="val" id="h-round-val">1 / 6</span>
+    </div>
+    <div class="round-dots" id="round-dots"></div>
+    <div class="pop-header-widget" id="h-pop">
+      <span class="lbl">Popularity</span>
+      <div class="pop-header-num-row">
+        <span class="pop-header-num" id="h-pop-val">60</span>
+        <span class="pop-header-mandate" id="h-pop-mandate">Slim Majority</span>
+      </div>
+      <div class="pop-mini-track"><div class="pop-mini-fill" id="h-pop-fill" style="width:60%;background:#f0b429"></div></div>
+    </div>
+    <div class="hstat" id="h-budget">
+      <span class="lbl">Policy Points</span>
+      <span class="val" id="h-budget-val">8</span>
+    </div>
+    <div class="hstat" id="h-ssp">
+      <span class="lbl">Scenario</span>
+      <span class="val" id="h-ssp-val" style="font-size:.95em">SSP2</span>
+    </div>
+  </div>
+
+  <div id="game-body">
+    <!-- LEFT: indicators -->
+    <div id="left-panel">
+      <div class="panel-head">📊 System State</div>
+      <div id="indicators-grid"></div>
+      <div id="pop-chart-box">
+        <h4>👥 Popularity Over Time</h4>
+        <div id="pop-chart-svg"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: measures -->
+    <div id="right-panel">
+      <div id="measures-scroll">
+        <div class="panel-head">🎛️ Policy Measures</div>
+        <div id="measures-list"></div>
+        <div style="margin:8px 0 4px;padding:8px 10px;background:#1a1535;border:1px solid #4a3567;border-radius:7px;font-size:.74em;color:#bc8cff;line-height:1.45">
+          🌍 <strong>Cross-Sector events</strong> (Energy Transition, Bioplastics, Timber Cities; and Demographic &amp; Human Development in SSP2/3) appear as <strong>wildcards at each round's end</strong>, drawn automatically from your SSP scenario pool.
+        </div>
+      </div>
+      <div id="end-round-bar">
+        <div class="forecast-row" id="pop-forecast-bar">Select policies to see popularity forecast</div>
+        <button class="btn-end-round" id="btn-end" onclick="endRound()">
+          Advance to 2030 →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ RESULT ═══════════════════════════ -->
+<div id="screen-result" class="screen">
+  <div class="result-box">
+    <div class="result-year" id="res-year"></div>
+    <div class="result-subtitle" id="res-subtitle"></div>
+    <div class="narrative-box" id="res-narrative"></div>
+    <div class="pop-section" id="res-pop-section"><!-- filled by JS --></div>
+    <div class="measures-taken">
+      <h4>Measures Implemented This Round</h4>
+      <div id="res-taken"></div>
+    </div>
+    <div id="res-wildcards" class="wildcard-box"></div>
+    <div class="changes-grid" id="res-changes"></div>
+    <button class="btn-primary" id="btn-next-round" onclick="nextRound()">Continue →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ FINAL ═══════════════════════════ -->
+<div id="screen-final" class="screen">
+  <div class="final-box">
+    <div class="final-title" id="fin-title"></div>
+    <div class="final-sub" id="fin-sub">Global Food System Assessment — 2050</div>
+    <div class="score-ring" id="fin-ring">
+      <div class="score-num" id="fin-score"></div>
+      <div class="score-lbl">/ 100</div>
+    </div>
+    <br>
+    <div class="grade-tag" id="fin-grade"></div>
+    <div class="final-indicators" id="fin-indicators"></div>
+    <div class="final-msg" id="fin-msg"></div>
+    <div class="final-ref">
+      Bodirsky et al. (2025), Nature Food — research shows combining all 23 food system measures
+      reduces mortality by 182 million life years/year and near-halves nitrogen surplus by 2050.
+    </div>
+    <div class="final-btns">
+      <button class="btn-secondary" onclick="resetGame()">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<div id="tutorial-overlay">
+  <div id="tut-spotlight"></div>
+  <div id="tut-tip">
+    <div class="tut-title" id="tut-title"></div>
+    <div class="tut-body"  id="tut-body"></div>
+    <div class="tut-footer">
+      <span class="tut-counter" id="tut-counter"></span>
+      <div class="tut-btns">
+        <button class="tut-skip" onclick="closeTutorial()">Skip</button>
+        <button class="tut-next" id="tut-next-btn" onclick="tutNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA — loaded at runtime from indicators.csv and measures.csv
+// ═══════════════════════════════════════════════════════════════
+
+let IND_DEFS = [];   // populated by loadData()
+let MEASURES = [];   // populated by loadData()
+
+
+const CAT_META = {
+  'Diets':        { icon:'🍽️', color:'#58d68d' },
+  'Livelihoods':  { icon:'💼', color:'#58a6ff' },
+  'Biosphere':    { icon:'🌿', color:'#79c0ff' },
+  'Agriculture':  { icon:'🌾', color:'#f0b429' },
+  'Cross-Sector': { icon:'🌍', color:'#bc8cff' },
+};
+
+let SYNERGIES = [];  // populated from measures.csv synergy rows by loadData()
+
+const NARRATIVES = [
+  // round 0→1  (shown after round 1 ends)
+  r => {
+    const low = getLow();
+    if(low.includes('climate')) return 'Agricultural GHG emissions continue rising. AFOLU contributes over 11 GtCO₂e/year. The 1.5°C window is closing fast.';
+    return 'Food systems are under pressure globally. Early action is crucial to shift trajectories before 2030.';
+  },
+  r => 'The decade of action is underway. Model projections show that diet and farming changes are beginning to reduce pressure on land and water systems.',
+  r => 'Midpoint assessment: without the energy transition, global warming remains on track for 2°C+. Combining food system measures with cross-sector action is now critical.',
+  r => 'Agricultural labour markets are shifting rapidly. Structural change requires careful management of transitions in low-income regions.',
+  r => 'Final stretch. Biodiversity hotspots remain under pressure. Land conservation measures must be in place by 2045 to protect the most critical ecosystems.',
+  r => 'The 2050 assessment is complete. Your policy package has shaped the global food system. Results below reflect cumulative impacts of all implemented measures.',
+];
+
+// Built from indicators.csv by loadData()
+let IND_LABELS = {};
+let VOTER_WEIGHTS = {};
+
+// ═══════════════════════════════════════════════════════════════
+//  CSV LOADER
+// ═══════════════════════════════════════════════════════════════
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    const fields = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { fields.push(cur); cur = ''; }
+      else { cur += c; }
+    }
+    fields.push(cur);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (fields[i] || '').trim(); });
+    return obj;
+  });
+}
+
+async function loadData() {
+  const errEl = document.getElementById('load-error');
+  try {
+    const [mRes, iRes] = await Promise.all([
+      fetch('measures.csv'),
+      fetch('indicators.csv')
+    ]);
+    if (!mRes.ok || !iRes.ok) throw new Error('HTTP error');
+    const [mText, iText] = await Promise.all([mRes.text(), iRes.text()]);
+
+    // Build IND_DEFS from indicators.csv
+    IND_DEFS = parseCSV(iText).map(r => {
+      const d = {
+        id:             r.id,
+        name:           r.name,
+        emoji:          r.emoji,
+        unit:           r.unit,
+        start:          parseFloat(r.start),
+        trendSSP1:      parseFloat(r.trendSSP1),
+        trendSSP2:      parseFloat(r.trendSSP2),
+        trendSSP3:      parseFloat(r.trendSSP3),
+        goodThreshold:  parseFloat(r.goodThreshold),
+        badThreshold:   parseFloat(r.badThreshold),
+        trend:          parseFloat(r.trendSSP2), // default until SSP chosen
+        desc:           r.desc,
+      };
+      if (r.lowerBetter === 'true') d.lowerBetter = true;
+      return d;
+    });
+
+    // Derive IND_LABELS and VOTER_WEIGHTS from IND_DEFS rows
+    parseCSV(iText).forEach(r => {
+      IND_LABELS[r.id]   = r.name;
+      VOTER_WEIGHTS[r.id] = parseFloat(r.voterWeight) || 1;
+    });
+
+    // Build MEASURES and SYNERGIES from measures.csv
+    // Effect columns = any column not in the fixed set
+    const fixedCols = new Set(['id','name','cat','cost','desc','synergy','popularity']);
+    const mRows = parseCSV(mText);
+
+    function parseEffects(r) {
+      const effects = {};
+      Object.keys(r).forEach(k => {
+        if (!fixedCols.has(k)) {
+          const v = parseFloat(r[k]);
+          if (!isNaN(v) && v !== 0) effects[k] = v;
+        }
+      });
+      return effects;
+    }
+
+    MEASURES = mRows
+      .filter(r => !r.synergy || !r.synergy.trim())
+      .map(r => ({ id:r.id, name:r.name, cat:r.cat, cost:parseInt(r.cost), effects:parseEffects(r), desc:r.desc, popEffect:parseFloat(r.popularity)||0 }));
+
+    // Parse synergy trigger string: "Diets=4,Biosphere=1" → [{cat,min}, ...]
+    SYNERGIES = mRows
+      .filter(r => r.synergy && r.synergy.trim())
+      .map(r => ({
+        triggers: r.synergy.trim().split(',').map(t => {
+          const [cat, n] = t.trim().split('=');
+          return { cat: cat.trim(), min: parseInt(n) || 1 };
+        }),
+        bonus: parseEffects(r),
+        label: r.name,
+        desc:  r.desc,
+      }));
+
+    document.getElementById('load-overlay').style.display = 'none';
+    initState();
+  } catch(e) {
+    errEl.style.display = 'block';
+    errEl.textContent = '⚠️ Could not load CSV files. Serve this folder via a local web server, e.g.: python -m http.server 8000 --bind 127.0.0.1 and then go to http://localhost:8000/FoodSystem2050.html';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+
+let state = {};
+
+const RETIREMENT_THRESHOLD = 20;  // popularity below this → forced retirement
+
+function generateWildcardSchedule(sspChoice) {
+  const universalIds = ['EnergyTrans', 'Bioplastics', 'TimberCities'];
+  const allIds = ['Population', 'HumanDevelop', 'EnergyTrans', 'Bioplastics', 'TimberCities'];
+  const eligibleIds = sspChoice === 1 ? universalIds : allIds;
+  // Each measure can be drawn up to 3 times
+  const pool = [];
+  eligibleIds.forEach(id => { pool.push(id, id, id); });
+  // Total draws per SSP: SSP1=9 (all), SSP2=8, SSP3=4
+  const totalDraws = sspChoice === 1 ? 9 : sspChoice === 2 ? 8 : 4;
+  // Shuffle pool and pick
+  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
+  const chosen = shuffled.slice(0, Math.min(totalDraws, shuffled.length));
+  // Assign each draw randomly to a round (1–6)
+  const schedule = {1:[],2:[],3:[],4:[],5:[],6:[]};
+  chosen.forEach(id => { schedule[Math.ceil(Math.random() * 6)].push(id); });
+  return schedule;
+}
+
+function initState(sspChoice) {
+  sspChoice = sspChoice || 2;
+  // Apply SSP-specific trend to each indicator
+  IND_DEFS.forEach(d => { d.trend = d['trendSSP' + sspChoice]; });
+  const indicators = {};
+  IND_DEFS.forEach(d => { indicators[d.id] = d.start; });
+  state = {
+    round: 1,
+    budget: 8,
+    popularity: 60,
+    sspChoice,
+    lastPopDelta: null,
+    indicators,
+    history: [{ year: 2020, indicators: {...indicators} }],
+    popHistory: [60],     // popularity at start of each round (for sparkline)
+    purchaseCounts: {},   // lifetime counts per measure (for synergy logic)
+    selectedCounts: {},   // this-round selections: measureId → count
+    prevIndicators: {...indicators},
+    wildcardCounts: {},
+    wildcardSchedule: generateWildcardSchedule(sspChoice),
+    collapsed: {},
+    retired: false,
+  };
+}
+
+// Cost of one more unit of measure m (given current selectedCounts)
+function nextUnitCost(m) {
+  const priorPurchases = state.purchaseCounts[m.id] || 0;
+  const thisRound = state.selectedCounts[m.id] || 0;
+  return m.cost * (priorPurchases + thisRound + 1);
+}
+
+// ── Popularity helpers ──────────────────────────────────────────
+
+function budgetFromPopularity(pop) {
+  if(pop >= 80) return 12;  // landslide
+  if(pop >= 65) return 10;   // strong majority
+  if(pop >= 50) return 8;   // slim majority
+  if(pop >= 35) return 6;   // coalition
+  if(pop >= 20) return 4;   // minority govt
+  return 3;                  // caretaker
+}
+
+function mandateLabel(pop) {
+  if(pop >= 80) return 'Landslide';
+  if(pop >= 65) return 'Strong Majority';
+  if(pop >= 50) return 'Slim Majority';
+  if(pop >= 35) return 'Coalition';
+  if(pop >= 20) return 'Minority Govt';
+  return 'Gov\'t in Crisis';
+}
+
+function mandateColor(pop) {
+  if(pop >= 65) return '#58d68d';
+  if(pop >= 35) return '#f0b429';
+  return '#f85149';
+}
+
+// Shared popularity computation — pass indicator snapshot and whether to apply measure preview
+function _popParts(indicators) {
+  const activeDefs = IND_DEFS.filter(d => d.id !== 'vestedInterests');
+  const totalW = activeDefs.reduce((s, d) => s + (VOTER_WEIGHTS[d.id] || 1), 0);
+  let levelPart = 0, tendencyPart = 0;
+  activeDefs.forEach(d => {
+    const w   = VOTER_WEIGHTS[d.id] || 1;
+    const wf  = w / totalW;  // normalised weight
+    const norm = normalizeInd(indicators[d.id], d);
+
+    // Level: below 0.35 = bad zone (penalise), above 0.7 = good zone (reward)
+    if(norm < 0.35)      levelPart -= (0.35 - norm) / 0.35 * wf * 60;
+    else if(norm > 0.7)  levelPart += (norm - 0.7)  / 0.3  * wf * 10;
+
+    // Tendency: did this indicator improve or worsen vs previous round?
+    const prev = state.prevIndicators ? state.prevIndicators[d.id] : null;
+    if(prev !== null && prev !== undefined) {
+      const tRange = Math.abs(d.goodThreshold - d.badThreshold);
+      if(tRange > 0) {
+        const change = indicators[d.id] - prev;
+        const normT = (d.lowerBetter ? -change : change) / tRange;
+        tendencyPart += normT * wf * 100;
+      }
+    }
+  });
+  return {
+    levelPart:    Math.round(levelPart    * 10) / 10,
+    tendencyPart: Math.round(tendencyPart * 10) / 10,
+  };
+}
+
+// Full delta calculation after a round ends
+function calcPopularityDelta(directPart) {
+  const { levelPart, tendencyPart } = _popParts(state.indicators);
+  directPart = Math.round((directPart || 0) * 10) / 10;
+  return {
+    levelPart,
+    tendencyPart,
+    directPart,
+    total: Math.round((levelPart + tendencyPart + directPart + 10) * 10) / 10,
+  };
+}
+
+// Estimate delta for forecast bar (current selections pre-applied)
+function previewPopDelta() {
+  // Build a projected indicator snapshot with selected measures applied
+  const proj = { ...state.indicators };
+  Object.entries(state.selectedCounts).forEach(([id, cnt]) => {
+    if(cnt <= 0) return;
+    const m = MEASURES.find(m => m.id === id);
+    if(!m) return;
+    Object.entries(m.effects).forEach(([ind, val]) => {
+      proj[ind] = (proj[ind] || 0) + val * cnt;
+    });
+  });
+  IND_DEFS.forEach(d => { proj[d.id] = (proj[d.id] || 0) + d.trend; });
+  let directPop = 0;
+  Object.entries(state.selectedCounts).forEach(([id, cnt]) => {
+    if(cnt <= 0) return;
+    const m = MEASURES.find(m => m.id === id);
+    if(m) directPop += (m.popEffect || 0) * cnt;
+  });
+  const { levelPart, tendencyPart } = _popParts(proj);
+  return { total: Math.round((levelPart + tendencyPart + directPop) * 10) / 10 };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GAUGE MATH
+// ═══════════════════════════════════════════════════════════════
+
+// Normalise indicator to [0,1]: 0 = at/beyond bad, 1 = at/beyond good
+function normalizeInd(val, d) {
+  const range = Math.abs(d.goodThreshold - d.badThreshold);
+  if(range === 0) return 0.5;
+  const raw = d.lowerBetter
+    ? (d.badThreshold - val)  / range
+    : (val - d.badThreshold) / range;
+  return Math.max(0, Math.min(1, raw));
+}
+
+// Per-indicator clamp (allows afoluGHG to go negative)
+function clampInd(val, d) {
+  if(d.id === 'afoluGHG')   return Math.max(-20, val);
+  if(d.id === 'croplandBII' || d.id === 'hotspotBII') return Math.max(0, Math.min(100, val));
+return Math.max(0, val);
+}
+
+// Colour based on per-indicator thresholds
+// Green = met goodThreshold, yellow = between thresholds, red = past badThreshold
+function indColor(val, d) {
+  if (d.lowerBetter) {
+    if (val <= d.goodThreshold) return '#58d68d';
+    if (val <= d.badThreshold)  return '#f0b429';
+    return '#f85149';
+  } else {
+    if (val >= d.goodThreshold) return '#58d68d';
+    if (val >= d.badThreshold)  return '#f0b429';
+    return '#f85149';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════════
+
+function renderGame() {
+  renderHeader();
+  renderIndicators();
+  renderPopChart();
+  renderMeasures();
+  renderEndBtn();
+}
+
+function renderPopChart() {
+  const W = 440, H = 56, xL = 6, xR = 434, yT = 4, yB = 48;
+  const cW = xR - xL, cH = yB - yT;
+  const data = state.popHistory;  // one value per completed round-start + end
+  const totalRounds = 6;
+
+  function xP(i) { return xL + i / totalRounds * cW; }
+  function yP(v) { return yB - Math.max(0, Math.min(100, v)) / 100 * cH; }
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
+
+  // Mandate bands
+  [[80,100,'rgba(88,214,141,.07)'],[65,80,'rgba(88,214,141,.05)'],
+   [35,65,'rgba(240,180,41,.05)'],[20,35,'rgba(248,81,73,.05)'],
+   [0,20,'rgba(248,81,73,.09)']].forEach(([lo,hi,fill]) => {
+    s += `<rect x="${xL}" y="${yP(hi).toFixed(1)}" width="${cW}" height="${Math.max(0,yP(lo)-yP(hi)).toFixed(1)}" fill="${fill}"/>`;
+  });
+
+  // Border
+  s += `<rect x="${xL}" y="${yT}" width="${cW}" height="${cH}" fill="none" stroke="#21262d" stroke-width="0.5"/>`;
+
+  // Retirement threshold line
+  s += `<line x1="${xL}" y1="${yP(20).toFixed(1)}" x2="${xR}" y2="${yP(20).toFixed(1)}" stroke="#f85149" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.5"/>`;
+
+  // Segment lines + dots coloured by mandate
+  for(let i = 1; i < data.length; i++) {
+    const col = mandateColor(data[i]);
+    s += `<line x1="${xP(i-1).toFixed(1)}" y1="${yP(data[i-1]).toFixed(1)}" x2="${xP(i).toFixed(1)}" y2="${yP(data[i]).toFixed(1)}" stroke="${col}" stroke-width="2"/>`;
+  }
+  data.forEach((v, i) => {
+    const col = mandateColor(v);
+    s += `<circle cx="${xP(i).toFixed(1)}" cy="${yP(v).toFixed(1)}" r="2.8" fill="${col}"/>`;
+    s += `<text x="${xP(i).toFixed(1)}" y="${yB+9}" text-anchor="middle" font-size="8" fill="#555">${i===0?'Start':`R${i}`}</text>`;
+  });
+
+  // Future round markers (hollow)
+  for(let i = data.length; i <= totalRounds; i++) {
+    s += `<circle cx="${xP(i).toFixed(1)}" cy="${yP(50).toFixed(1)}" r="2" fill="none" stroke="#30363d" stroke-width="1"/>`;
+    s += `<text x="${xP(i).toFixed(1)}" y="${yB+9}" text-anchor="middle" font-size="8" fill="#333">R${i}</text>`;
+  }
+
+  s += `</svg>`;
+  document.getElementById('pop-chart-svg').innerHTML = s;
+}
+
+function renderHeader() {
+  const year = 2020 + (state.round-1)*5;
+  document.getElementById('h-year-val').textContent = year;
+  document.getElementById('h-round-val').textContent = `${state.round} / 6`;
+  document.getElementById('h-budget-val').textContent = state.budget - selectedCost();
+
+  const dots = document.getElementById('round-dots');
+  dots.innerHTML = Array.from({length:6},(_,i)=>{
+    const cls = i+1 < state.round ? 'done' : i+1 === state.round ? 'current' : '';
+    return `<div class="rdot ${cls}"></div>`;
+  }).join('');
+
+  // Popularity widget
+  const pop = Math.round(state.popularity);
+  const col = mandateColor(pop);
+  document.getElementById('h-pop-val').textContent = pop;
+  document.getElementById('h-pop-val').style.color = col;
+  document.getElementById('h-pop-mandate').textContent = mandateLabel(pop);
+  document.getElementById('h-pop-mandate').style.color = col;
+  const fill = document.getElementById('h-pop-fill');
+  fill.style.width = pop + '%';
+  fill.style.background = col;
+
+  const nextYear = 2020 + state.round*5;
+  document.getElementById('btn-end').textContent =
+    state.round < 6 ? `Advance to ${nextYear} →` : 'Submit Final Policies →';
+
+  const sspEl = document.getElementById('h-ssp-val');
+  const sspLabels = {1:'SSP1 🟢', 2:'SSP2 🟡', 3:'SSP3 🔴'};
+  const sspColors = {1:'#58d68d', 2:'#f0b429', 3:'#f85149'};
+  sspEl.textContent = sspLabels[state.sspChoice] || 'SSP2';
+  sspEl.style.color  = sspColors[state.sspChoice] || '#f0b429';
+}
+
+function makeChartSVG(d) {
+  // Layout constants
+  const vbW = 260, vbH = 92;
+  const xL = 28, xR = 254, yT = 6, yB = 74;
+  const cW = xR - xL, cH = yB - yT;
+
+  // ── Y-axis range in actual units ─────────────────────────────
+  const proj2050lo = d.start + d.trendSSP1 * 6;
+  const proj2050hi = d.start + d.trendSSP3 * 6;
+  const back2000   = d.start - d.trendSSP2 * 4;
+  const allVals = [d.start, d.goodThreshold, d.badThreshold, proj2050lo, proj2050hi, back2000];
+  const rawLo = Math.min(...allVals), rawHi = Math.max(...allVals);
+  const span  = rawHi - rawLo || Math.abs(d.start) * 0.2 || 1;
+  const yMin  = rawLo - span * 0.12;
+  const yMax  = rawHi + span * 0.12;
+
+  function xPos(year) { return xL + (year - 2000) / 50 * cW; }
+  function yPos(v)    { return yB - (v - yMin) / (yMax - yMin) * cH; }
+  function cy(y)      { return Math.max(yT, Math.min(yB, y)); }  // clamp to chart area
+  function ptStr(pts) { return pts.map(([x,y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' '); }
+
+  // Format a value for the y-axis tick label
+  function fmtTick(v) {
+    const a = Math.abs(v);
+    if(a >= 1000) return (Math.round(v/100)/10) + 'k';
+    if(a >= 10)   return Math.round(v);
+    if(a >= 1)    return Math.round(v*10)/10;
+    return Math.round(v*100)/100;
+  }
+
+  const lb  = d.lowerBetter;
+  const val = state.indicators[d.id];
+  const col = indColor(val, d);
+  const currentYear = 2020 + (state.round - 1) * 5;
+
+  // ── Background colour bands using actual thresholds ───────────
+  const gY = yPos(d.goodThreshold), bY = yPos(d.badThreshold);
+  let bands;
+  if(lb) {
+    // lower=better: high values (top of chart) = red, low values (bottom) = green
+    bands = [
+      [yT,      cy(bY), 'rgba(248,81,73,.08)'],
+      [cy(bY),  cy(gY), 'rgba(240,180,41,.07)'],
+      [cy(gY),  yB,     'rgba(88,214,141,.07)'],
+    ];
+  } else {
+    // higher=better: high values (top) = green, low values (bottom) = red
+    bands = [
+      [yT,      cy(gY), 'rgba(88,214,141,.07)'],
+      [cy(gY),  cy(bY), 'rgba(240,180,41,.07)'],
+      [cy(bY),  yB,     'rgba(248,81,73,.08)'],
+    ];
+  }
+
+  // ── Data series ──────────────────────────────────────────────
+  // 1. Synthetic pre-game history 2000–2020
+  const synthPts = [];
+  for(let y = 2000; y <= 2020; y += 5)
+    synthPts.push([xPos(y), yPos(d.start + (y - 2020) / 5 * d.trendSSP2)]);
+
+  // 2. Actual game history (2020 → current)
+  const histPts = state.history.map(h => [xPos(h.year), yPos(h.indicators[d.id])]);
+
+  // 3. Baseline projection from last recorded point to 2050
+  const lastH   = state.history[state.history.length - 1];
+  const lastVal = lastH.indicators[d.id];
+  const projPts = [[xPos(lastH.year), yPos(lastVal)]];
+  for(let y = lastH.year + 5; y <= 2050; y += 5)
+    projPts.push([xPos(y), yPos(lastVal + (y - lastH.year) / 5 * d.trend)]);
+
+  // 4. Preview: next-round value with current selections
+  let measureEffect = 0;
+  Object.entries(state.selectedCounts).forEach(([id, cnt]) => {
+    if(cnt <= 0) return;
+    const m = MEASURES.find(m => m.id === id);
+    if(m && m.effects[d.id]) measureEffect += m.effects[d.id] * cnt;
+  });
+  const previewVal  = clampInd(val + measureEffect + d.trend, d);
+  const hasPreview  = measureEffect !== 0;
+  const previewGood = lb ? measureEffect < 0 : measureEffect > 0;
+  const previewCol  = previewGood ? '#58d68d' : '#f85149';
+
+  // ── SVG assembly ─────────────────────────────────────────────
+  const x2020 = xPos(2020).toFixed(1);
+  const xCur  = xPos(currentYear).toFixed(1);
+  let s = `<svg viewBox="0 0 ${vbW} ${vbH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
+
+  // Bands
+  bands.forEach(([y1, y2, fill]) => {
+    const h = Math.max(0, y2 - y1);
+    if(h > 0) s += `<rect x="${xL}" y="${y1.toFixed(1)}" width="${cW}" height="${h.toFixed(1)}" fill="${fill}"/>`;
+  });
+
+  // Chart border
+  s += `<rect x="${xL}" y="${yT}" width="${cW}" height="${cH}" fill="none" stroke="#21262d" stroke-width="0.5"/>`;
+
+  // Y-axis ticks (3 values: min, mid, max)
+  const yMid = (yMin + yMax) / 2;
+  [[yMin, yB], [yMid, (yT+yB)/2], [yMax, yT]].forEach(([v, sy]) => {
+    s += `<text x="${xL-2}" y="${sy+3}" text-anchor="end" font-size="9" fill="#555">${fmtTick(v)}</text>`;
+  });
+
+  // 2020 reference line
+  s += `<line x1="${x2020}" y1="${yT}" x2="${x2020}" y2="${yB}" stroke="#555" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+  s += `<text x="${x2020}" y="${yB+9}" text-anchor="middle" font-size="9" fill="#666">2020</text>`;
+
+  // Current-round reference line
+  if(currentYear > 2020) {
+    s += `<line x1="${xCur}" y1="${yT}" x2="${xCur}" y2="${yB}" stroke="#58a6ff" stroke-width="0.9" stroke-dasharray="3,2"/>`;
+    s += `<text x="${xCur}" y="${yB+9}" text-anchor="middle" font-size="9" fill="#58a6ff">${currentYear}</text>`;
+  }
+
+  // X-axis year labels
+  s += `<text x="${xPos(2000).toFixed(1)}" y="${yB+9}" text-anchor="start" font-size="9" fill="#555">2000</text>`;
+  s += `<text x="${xPos(2050).toFixed(1)}" y="${yB+9}" text-anchor="end" font-size="9" fill="#555">2050</text>`;
+
+  // Synthetic history (muted, 2000–2020)
+  s += `<polyline points="${ptStr(synthPts)}" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.3"/>`;
+
+  // Game history (solid, 2020–current)
+  if(histPts.length >= 2)
+    s += `<polyline points="${ptStr(histPts)}" fill="none" stroke="${col}" stroke-width="2"/>`;
+
+  // Baseline projection (dashed, current–2050)
+  if(projPts.length >= 2)
+    s += `<polyline points="${ptStr(projPts)}" fill="none" stroke="${col}" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.45"/>`;
+
+  // Preview arrow
+  if(hasPreview) {
+    const nx = xPos(currentYear + 5).toFixed(1);
+    const ny = yPos(previewVal).toFixed(1);
+    s += `<line x1="${xCur}" y1="${yPos(val).toFixed(1)}" x2="${nx}" y2="${ny}" stroke="${previewCol}" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.85"/>`;
+    s += `<circle cx="${nx}" cy="${ny}" r="2.2" fill="${previewCol}" opacity="0.85"/>`;
+  }
+
+  // Current value dot
+  s += `<circle cx="${xPos(currentYear).toFixed(1)}" cy="${yPos(val).toFixed(1)}" r="3" fill="${col}"/>`;
+
+  s += `</svg>`;
+  return s;
+}
+
+function renderIndicators() {
+  const grid = document.getElementById('indicators-grid');
+  grid.innerHTML = IND_DEFS.filter(d => d.id !== 'vestedInterests').map(d => {
+    const val = state.indicators[d.id];
+    const lb  = d.lowerBetter;
+    const col = indColor(val, d);
+
+    // Card border highlight based on preview direction
+    let preview = 0;
+    Object.entries(state.selectedCounts).forEach(([id, cnt]) => {
+      if(cnt <= 0) return;
+      const m = MEASURES.find(m => m.id === id);
+      if(m && m.effects[d.id]) preview += m.effects[d.id] * cnt;
+    });
+    const previewGood = lb ? preview < 0 : preview > 0;
+    const previewBad  = lb ? preview > 0 : preview < 0;
+    const cardCls = previewGood ? 'hi' : previewBad ? 'lo' : '';
+
+    const lowerTag = lb ? ` <span style="font-size:.62em;color:#8b949e;font-weight:400">↓</span>` : '';
+
+    return `<div class="gauge-card ${cardCls}" title="${d.desc}">
+      <div class="chart-header">
+        <span class="g-name">${d.emoji} ${d.name}${lowerTag}</span>
+        <span class="g-value" style="color:${col}">${fmtVal(val, d)}</span>
+      </div>
+      ${makeChartSVG(d)}
+    </div>`;
+  }).join('');
+}
+
+function renderSynergies() {
+  const rows = document.getElementById('synergy-rows');
+  rows.innerHTML = SYNERGIES.map(s => {
+    const active = isSynergyActive(s);
+    const cls = active ? 'syn-on' : 'syn-off';
+    return `<div class="syn-row">
+      <span class="syn-badge ${cls}">${active?'✓':' '} ${s.label}</span>
+      <span class="syn-desc">${s.desc}</span>
+    </div>`;
+  }).join('');
+}
+
+function isSynergyActive(s) {
+  return s.triggers.every(t => {
+    const count = MEASURES.filter(m =>
+      m.cat === t.cat && (
+        (state.purchaseCounts[m.id]||0) +
+        (state.selectedCounts[m.id]||0) +
+        (state.wildcardCounts[m.id]||0)
+      ) >= 1
+    ).length;
+    return count >= t.min;
+  });
+}
+
+function renderMeasures() {
+  const cats = [...new Set(MEASURES.map(m=>m.cat))].filter(c => c !== 'Cross-Sector');
+  const list = document.getElementById('measures-list');
+  list.innerHTML = cats.map(cat => {
+    const meta = CAT_META[cat];
+    const catMeasures = MEASURES.filter(m=>m.cat===cat);
+    const totalBought = catMeasures.reduce((s,m) => s + (state.purchaseCounts[m.id]||0), 0);
+    const collapsed = state.collapsed[cat] ? 'collapsed' : '';
+
+    const cards = catMeasures.map(m => {
+      const selCount  = state.selectedCounts[m.id] || 0;
+      const priorCount = state.purchaseCounts[m.id] || 0;
+      const isSel = selCount > 0;
+      const remaining = state.budget - selectedCost();
+      const nextCost = nextUnitCost(m);
+      const canAfford = nextCost <= remaining;
+
+      const repeatStep = priorCount + selCount + 1;
+      const costDisplay = `${nextCost} pts`;
+      const repeatNote = (priorCount + selCount) > 0
+        ? ` <span class="repeat-note">×${repeatStep}</span>` : '';
+
+      let cls = isSel ? 'msel' : (!canAfford && !isSel) ? 'mbusy' : '';
+      if(priorCount > 0 && !isSel) cls += ' mprior';
+
+      const popChip = m.popEffect !== 0
+        ? `<span class="chip ${m.popEffect>0?'chip-p':'chip-n'}">${m.popEffect>0?'+':''}${m.popEffect} Popularity</span>`
+        : '';
+      const chips = popChip + Object.entries(m.effects).filter(([ind]) => ind !== 'vestedInterests').map(([ind,val]) => {
+        const lbl = IND_LABELS[ind] || ind;
+        const def = IND_DEFS.find(d => d.id === ind);
+        const isGood = (def && def.lowerBetter) ? val < 0 : val > 0;
+        return `<span class="chip ${isGood?'chip-p':'chip-n'}">${val>0?'+':''}${val} ${lbl}</span>`;
+      }).join('');
+
+      const countBadge = selCount > 0 ? `<span class="sel-count">×${selCount}</span>` : '';
+      const addBtn = isSel && canAfford
+        ? `<span class="add-purchase" onclick="addPurchase('${m.id}',event)" title="Buy another">＋</span>` : '';
+      const priorBadge = priorCount > 0
+        ? `<span class="prior-badge" title="Bought ${priorCount}× in past rounds">✓${priorCount}</span>` : '';
+
+      return `<div class="mcard ${cls}" onclick="toggleMeasure('${m.id}')">
+        <div class="mhead">
+          <span class="mname">${m.name}</span>
+          <span class="mcost-row">${priorBadge}${countBadge}${addBtn}<span class="mcost ${isSel?'sel':''}">${costDisplay}${repeatNote}</span></span>
+        </div>
+        <div class="mdesc">${m.desc}</div>
+        <div class="mfx">${chips}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cat-section">
+      <div class="cat-head" onclick="toggleCat('${cat}')">
+        <span class="cat-icon">${meta.icon}</span>
+        <span class="cat-name" style="color:${meta.color}">${cat}</span>
+        <span class="cat-cost">${totalBought} purchases made</span>
+      </div>
+      <div class="cat-body ${collapsed}" id="cat-${cat.replace(/\s/g,'_')}">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderEndBtn() {
+  const cost = selectedCost();
+  const btn = document.getElementById('btn-end');
+  const nextYear = 2020 + state.round*5;
+  const label = state.round < 6 ? `Advance to ${nextYear}` : 'Submit Final Policies';
+  btn.textContent = cost > 0 ? `${label} (${cost} pts) →` : `${label} →`;
+
+  // Popularity forecast
+  const preview = previewPopDelta();
+  const rawNew = state.popularity + preview.total;
+  const newPop = Math.round(clamp(rawNew));
+  const sign = preview.total > 0 ? '+' : '';
+  const cls = preview.total > 0.4 ? 'forecast-pop-p' : preview.total < -0.4 ? 'forecast-pop-n' : 'forecast-pop-0';
+  const newCol = mandateColor(newPop);
+  const nextBudget = state.round < 6 ? budgetFromPopularity(newPop) : null;
+  const budgetStr = nextBudget
+    ? ` &nbsp;|&nbsp; <strong style="color:#f0b429">Next budget: ${nextBudget} pts</strong>`
+    : '';
+  const retireWarn = newPop < RETIREMENT_THRESHOLD
+    ? ` &nbsp;<strong style="color:#f85149">⚠️ RETIREMENT RISK</strong>` : '';
+  document.getElementById('pop-forecast-bar').innerHTML =
+    `Popularity: <span class="${cls}">${sign}${preview.total}</span> &rarr; `+
+    `<strong style="color:${newCol}">${newPop}</strong> `+
+    `<span style="color:${newCol}">(${mandateLabel(newPop)})</span>${budgetStr}${retireWarn}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INTERACTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function selectedCost() {
+  let c = 0;
+  Object.entries(state.selectedCounts).forEach(([id, cnt]) => {
+    if(cnt <= 0) return;
+    const m = MEASURES.find(m=>m.id===id);
+    if(!m) return;
+    const prior = state.purchaseCounts[id] || 0;
+    // Sum cost of each unit: cost*(prior+1) + cost*(prior+2) + ...
+    for(let i = 1; i <= cnt; i++) c += m.cost * (prior + i);
+  });
+  return c;
+}
+
+function toggleMeasure(id) {
+  const m = MEASURES.find(m=>m.id===id);
+  if(!m) return;
+  const cur = state.selectedCounts[id] || 0;
+  if(cur > 0) {
+    // clicking a selected card removes one purchase
+    state.selectedCounts[id] = cur - 1;
+  } else {
+    if(nextUnitCost(m) > state.budget - selectedCost()) return;
+    state.selectedCounts[id] = 1;
+  }
+  renderGame();
+}
+
+function addPurchase(id, e) {
+  e.stopPropagation();
+  const m = MEASURES.find(m=>m.id===id);
+  if(!m) return;
+  if(nextUnitCost(m) > state.budget - selectedCost()) return;
+  state.selectedCounts[id] = (state.selectedCounts[id] || 0) + 1;
+  renderGame();
+}
+
+function toggleCat(cat) {
+  state.collapsed[cat] = !state.collapsed[cat];
+  renderMeasures();
+}
+
+function getLow() {
+  return IND_DEFS.filter(d => normalizeInd(state.indicators[d.id], d) < 0.35).map(d => d.id);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ROUND LOGIC
+// ═══════════════════════════════════════════════════════════════
+
+function endRound() {
+  const prev = {...state.indicators};
+  // Track changes due to player's measures (separate from baseline)
+  const measureEffects = {};
+  IND_DEFS.forEach(d => { measureEffects[d.id] = 0; });
+
+  // 1. Apply baseline trends
+  IND_DEFS.forEach(d => {
+    state.indicators[d.id] = clampInd(state.indicators[d.id] + d.trend, d);
+  });
+
+  // 2. Apply selected measure effects (each purchase applies full effect)
+  const taken = [];
+  let directPopEffect = 0;
+  Object.entries(state.selectedCounts).forEach(([id, cnt]) => {
+    if(cnt <= 0) return;
+    const m = MEASURES.find(m=>m.id===id);
+    if(!m) return;
+    taken.push(cnt > 1 ? `${m.name} ×${cnt}` : m.name);
+    Object.entries(m.effects).forEach(([ind,val]) => {
+      const total = val * cnt;
+      const def = IND_DEFS.find(d => d.id === ind);
+      state.indicators[ind] = def
+        ? clampInd((state.indicators[ind]||0) + total, def)
+        : (state.indicators[ind]||0) + total;
+      measureEffects[ind] = (measureEffects[ind]||0) + total;
+    });
+    directPopEffect += (m.popEffect || 0) * cnt;
+    state.purchaseCounts[id] = (state.purchaseCounts[id]||0) + cnt;
+  });
+
+  // 3. Apply wildcard Cross-Sector events for this round
+  const wildcardList = [];
+  (state.wildcardSchedule[state.round] || []).forEach(id => {
+    const m = MEASURES.find(m => m.id === id);
+    if (!m) return;
+    wildcardList.push(m);
+    Object.entries(m.effects).forEach(([ind, val]) => {
+      const def = IND_DEFS.find(d => d.id === ind);
+      state.indicators[ind] = def
+        ? clampInd((state.indicators[ind]||0) + val, def)
+        : (state.indicators[ind]||0) + val;
+    });
+    state.wildcardCounts[id] = (state.wildcardCounts[id] || 0) + 1;
+  });
+
+  // 4. Synergy bonuses — also attributed to player
+  SYNERGIES.forEach(s => {
+    if(isSynActive(s, state.purchaseCounts)) {
+      Object.entries(s.bonus).forEach(([ind,val]) => {
+        const perRound = Math.round(val/6);
+        const def = IND_DEFS.find(d => d.id === ind);
+        state.indicators[ind] = def
+          ? clampInd((state.indicators[ind]||0) + perRound, def)
+          : (state.indicators[ind]||0) + perRound;
+        measureEffects[ind] = (measureEffects[ind]||0) + perRound;
+      });
+    }
+  });
+
+  // 5. Calculate popularity delta based on outcomes + direct measure effects
+  const popDelta = calcPopularityDelta(directPopEffect);
+  const prevPop = state.popularity;
+  state.popularity = clamp(state.popularity + popDelta.total);
+  state.lastPopDelta = { ...popDelta, prevPop };
+  if(state.popularity < RETIREMENT_THRESHOLD) state.retired = true;
+
+  state.history.push({ year: 2020 + state.round * 5, indicators: {...state.indicators} });
+  state.popHistory.push(Math.round(state.popularity));
+  state.unspentBudget = Math.max(0, state.budget - selectedCost());
+  showResult(prev, taken, wildcardList);
+  state.prevIndicators = {...state.indicators};
+  state.selectedCounts = {};
+}
+
+function isSynActive(s, purchaseCounts) {
+  return s.triggers.every(t => {
+    const count = MEASURES.filter(m =>
+      m.cat === t.cat && ((purchaseCounts[m.id]||0) + (state.wildcardCounts[m.id]||0)) >= 1
+    ).length;
+    return count >= t.min;
+  });
+}
+
+function showResult(prev, taken, wildcardList) {
+  const year = 2020 + state.round*5;
+  document.getElementById('res-year').textContent = `${year} Report`;
+  document.getElementById('res-subtitle').textContent =
+    `End of ${year-5}–${year} period · Round ${state.round} of 6`;
+
+  // Narrative
+  const narr = NARRATIVES[Math.min(state.round-1, NARRATIVES.length-1)];
+  document.getElementById('res-narrative').textContent =
+    typeof narr === 'function' ? narr(state.round) : narr;
+
+  // ── Popularity section ─────────────────────────────────────
+  const pd = state.lastPopDelta;
+  const prevPop = Math.round(pd.prevPop);
+  const newPop  = Math.round(state.popularity);
+  const prevCol = mandateColor(prevPop);
+  const newCol  = mandateColor(newPop);
+  const totalSign = pd.total >= 0 ? '+' : '';
+  const totalCls  = pd.total > 0.3 ? 'delta-p' : pd.total < -0.3 ? 'delta-n' : 'delta-0';
+  const nextBudget = state.round < 6 ? budgetFromPopularity(state.popularity) : null;
+
+  const levelSign     = pd.levelPart    >= 0 ? '+' : '';
+  const tendencySign  = pd.tendencyPart >= 0 ? '+' : '';
+  const directSign    = pd.directPart   >= 0 ? '+' : '';
+  const levelCol    = pd.levelPart    >= 0 ? '#58d68d' : '#f85149';
+  const tendencyCol = pd.tendencyPart >= 0 ? '#58d68d' : '#f85149';
+  const directCol   = pd.directPart   >= 0 ? '#58d68d' : '#f85149';
+
+  document.getElementById('res-pop-section').innerHTML = `
+    <div class="pop-section-title">👥 Popularity Update</div>
+    <div class="pop-bar-row">
+      <span class="pop-bar-lbl">Before</span>
+      <div class="pop-bar-track"><div class="pop-bar-fill" style="width:${prevPop}%;background:${prevCol}"></div></div>
+      <span class="pop-bar-val" style="color:${prevCol}">${prevPop}</span>
+    </div>
+    <div class="pop-bar-row">
+      <span class="pop-bar-lbl">After</span>
+      <div class="pop-bar-track"><div class="pop-bar-fill" style="width:${newPop}%;background:${newCol}"></div></div>
+      <span class="pop-bar-val" style="color:${newCol}">${newPop}</span>
+    </div>
+    <div class="pop-delta-summary">
+      <span class="pop-delta-lbl">Net change</span>
+      <span class="pop-delta-num ${totalCls}">${totalSign}${pd.total}</span>
+      <span style="font-size:.8em;color:${newCol};margin-left:6px">→ ${mandateLabel(newPop)}</span>
+    </div>
+    <div class="pop-comp-section">
+      <div class="pop-comp-title">What drove this?</div>
+      <div class="pop-comp-row">
+        <span class="pop-comp-icon">📊</span>
+        <span class="pop-comp-label">
+          Current state of outcomes
+          <span class="pop-comp-sub">Red indicators drag approval; green indicators lift it</span>
+        </span>
+        <span class="pop-comp-val" style="color:${levelCol}">${levelSign}${pd.levelPart}</span>
+      </div>
+      <div class="pop-comp-row">
+        <span class="pop-comp-icon">🌐</span>
+        <span class="pop-comp-label">
+          Background system trends
+          <span class="pop-comp-sub">Structural tendencies — improvement or deterioration</span>
+        </span>
+        <span class="pop-comp-val" style="color:${tendencyCol}">${tendencySign}${pd.tendencyPart}</span>
+      </div>
+      ${pd.directPart !== 0 ? `<div class="pop-comp-row">
+        <span class="pop-comp-icon">🎛️</span>
+        <span class="pop-comp-label">
+          Policy reaction
+          <span class="pop-comp-sub">Direct public response to your chosen measures</span>
+        </span>
+        <span class="pop-comp-val" style="color:${directCol}">${directSign}${pd.directPart}</span>
+      </div>` : ''}
+    </div>
+    ${nextBudget ? `<div class="pop-forecast-row">
+      <span>Next round mandate:</span>
+      <span class="pop-forecast-mandate" style="color:${newCol}">${mandateLabel(newPop)}</span>
+      <span class="pop-forecast-budget">${nextBudget} policy points</span>
+    </div>` : ''}`;
+
+  // Measures taken
+  const takenEl = document.getElementById('res-taken');
+  if(taken.length === 0) {
+    takenEl.innerHTML = '<span class="no-measures">No measures implemented this round.</span>';
+  } else {
+    takenEl.innerHTML = taken.map(n=>`<span class="taken-pill">${n}</span>`).join('');
+  }
+
+  // Wildcard events
+  const wcEl = document.getElementById('res-wildcards');
+  if (wildcardList && wildcardList.length > 0) {
+    wcEl.innerHTML = `<h4>🌍 Cross-Sector Events This Round</h4>` +
+      wildcardList.map(m => {
+        const chips = Object.entries(m.effects).filter(([ind]) => ind !== 'vestedInterests').map(([ind, val]) => {
+          const lbl = IND_LABELS[ind] || ind;
+          const def = IND_DEFS.find(d => d.id === ind);
+          const isGood = (def && def.lowerBetter) ? val < 0 : val > 0;
+          return `<span class="chip ${isGood?'chip-p':'chip-n'}">${val>0?'+':''}${val} ${lbl}</span>`;
+        }).join('');
+        return `<div class="wc-item">
+          <div class="wc-name">🌍 ${m.name}</div>
+          <div class="wc-desc">${m.desc}</div>
+          <div class="mfx">${chips}</div>
+        </div>`;
+      }).join('');
+  } else {
+    wcEl.innerHTML = `<h4>🌍 Cross-Sector Events This Round</h4><span class="no-measures">No cross-sector events this round.</span>`;
+  }
+
+  // Indicator changes
+  const grid = document.getElementById('res-changes');
+  grid.innerHTML = IND_DEFS.filter(d => d.id !== 'vestedInterests').map(d => {
+    const rawDelta = state.indicators[d.id] - prev[d.id];
+    // Round to same precision as fmtVal
+    const a = Math.abs(rawDelta);
+    const delta = a >= 100 ? Math.round(rawDelta) : a >= 10 ? Math.round(rawDelta*10)/10 : Math.round(rawDelta*100)/100;
+    const isGood = d.lowerBetter ? rawDelta < 0 : rawDelta > 0;
+    const isBad  = d.lowerBetter ? rawDelta > 0 : rawDelta < 0;
+    const cls   = isGood ? 'delta-p' : isBad ? 'delta-n' : 'delta-0';
+    const arrow = rawDelta > 0 ? '↑' : rawDelta < 0 ? '↓' : '→';
+    const sign  = rawDelta > 0 ? '+' : '';
+    return `<div class="chg-item">
+      <span>${d.emoji}</span>
+      <span class="chg-name">${d.name}</span>
+      <span class="chg-delta ${cls}">${arrow} ${sign}${delta}</span>
+    </div>`;
+  }).join('');
+
+  // Update continue button for retirement or end of game
+  const btn = document.getElementById('btn-next-round');
+  if(state.retired) {
+    btn.textContent = '📋 Go to Final Evaluation';
+    btn.style.background = '#f85149';
+    document.getElementById('res-subtitle').textContent +=
+      ' — ⚠️ Popularity collapsed below ' + RETIREMENT_THRESHOLD + '. You are forced to retire.';
+  } else if(state.round >= 6) {
+    btn.textContent = '📋 See Final Evaluation';
+    btn.style.background = '';
+  } else {
+    btn.textContent = 'Continue →';
+    btn.style.background = '';
+  }
+
+  setScreen('screen-result');
+}
+
+function nextRound() {
+  if(state.retired || state.round >= 6) { showFinal(); return; }
+  state.round++;
+  state.budget = budgetFromPopularity(state.popularity) + (state.unspentBudget || 0);
+  setScreen('screen-game');
+  renderGame();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FINAL SCREEN
+// ═══════════════════════════════════════════════════════════════
+
+function showFinal() {
+  // Apply end-of-game synergy bonuses (remaining)
+  SYNERGIES.forEach(s => {
+    if(isSynActive(s, state.purchaseCounts)) {
+      // Already applied per-round; give any remainder
+    }
+  });
+
+  // Score: voter-weighted average of normalised indicator values (0–100)
+  const scoreDefs = IND_DEFS.filter(d => d.id !== 'vestedInterests');
+  let wSum = 0, wTotal = 0;
+  scoreDefs.forEach(d => {
+    const w = VOTER_WEIGHTS[d.id] || 1;
+    wSum   += normalizeInd(state.indicators[d.id], d) * 100 * w;
+    wTotal += w;
+  });
+  const score = Math.round(wSum / wTotal);
+
+  // Count green/yellow/red using threshold-based normalisation
+  const greens = scoreDefs.filter(d => normalizeInd(state.indicators[d.id], d) >= 0.7).length;
+  const reds   = scoreDefs.filter(d => normalizeInd(state.indicators[d.id], d) <  0.35).length;
+
+  let grade, gradeText;
+  if(score>=75&&reds===0){ grade='S'; gradeText='Transformative Success'; }
+  else if(score>=68&&reds<=1){ grade='A'; gradeText='Excellent Transformation'; }
+  else if(score>=58&&reds<=2){ grade='B'; gradeText='Meaningful Progress'; }
+  else if(score>=48&&reds<=4){ grade='C'; gradeText='Partial Transformation'; }
+  else{ grade='D'; gradeText='Business-As-Usual Trajectory'; }
+
+  const ringColor = grade==='S'||grade==='A' ? '#58d68d' : grade==='B' ? '#f0b429' : '#f85149';
+  document.getElementById('fin-ring').style.borderColor = ringColor;
+  document.getElementById('fin-ring').style.boxShadow = `0 0 30px ${ringColor}33`;
+  document.getElementById('fin-score').textContent = score;
+  document.getElementById('fin-score').style.color = ringColor;
+
+  const retiredIn = state.retired ? ` (retired in ${2020 + state.round * 5})` : '';
+  document.getElementById('fin-sub').textContent =
+    state.retired
+      ? `Forced Early Retirement — ${2020 + state.round * 5}`
+      : 'Global Food System Assessment — 2050';
+  document.getElementById('fin-title').textContent =
+    state.retired ? '🏳️ Forced Out of Office' :
+    grade==='S'||grade==='A' ? '🌍 Food System Transformed!' :
+    grade==='B' ? '📈 Significant Progress Made' :
+    grade==='C' ? '⚠️ Partial Transformation' : '🔴 System Under Stress';
+
+  const gradeEl = document.getElementById('fin-grade');
+  if(state.retired) {
+    gradeEl.textContent = `Early Retirement — ${2020 + state.round * 5} · Score ${score}`;
+    gradeEl.className = 'grade-tag grade-D';
+  } else {
+    gradeEl.textContent = `Grade ${grade}: ${gradeText}`;
+    gradeEl.className = `grade-tag grade-${grade}`;
+  }
+
+  // Indicators grid
+  const inds = document.getElementById('fin-indicators');
+  inds.innerHTML = IND_DEFS.filter(d => d.id !== 'vestedInterests').map(d => {
+    const val  = state.indicators[d.id];
+    const norm = normalizeInd(val, d);
+    const isGreen  = norm >= 0.7;
+    const isYellow = norm >= 0.35;
+    const cls = isGreen ? 'fi-green' : isYellow ? 'fi-yellow' : 'fi-red';
+    const dot = isGreen ? '🟢' : isYellow ? '🟡' : '🔴';
+    const sub = d.lowerBetter ? '<span style="font-size:.65em;color:#8b949e;display:block">↓ lower better</span>' : '';
+    return `<div class="fi-card">
+      <div class="fi-emoji">${d.emoji}</div>
+      <div class="fi-name">${d.name}${sub}</div>
+      <div class="fi-val ${cls}">${fmtVal(val, d)} ${dot}</div>
+    </div>`;
+  }).join('');
+
+  // Message
+  const implCount = Object.values(state.purchaseCounts).reduce((a,b)=>a+b,0);
+  const retiredYear = 2020 + state.round * 5;
+  const msgs = {
+    S: `Remarkable achievement! You implemented ${implCount} measures across all policy domains, creating a food system that nourishes a healthy global population, protects ecosystems, and keeps warming below 1.5°C. The research by Bodirsky et al. (2025) shows this is achievable — but requires unprecedented coordination and political will.`,
+    A: `Excellent work! With ${implCount} measures implemented, you transformed the food system substantially. Combining diet shifts, nature protection, and agricultural innovation creates powerful co-benefits that no single measure can achieve alone.`,
+    B: `Good progress with ${implCount} measures. You improved most outcomes, but some indicators remain in the yellow zone. The article demonstrates that packaging measures together — especially combining demand-side (diets) with supply-side (agriculture) changes — is key to unlocking synergies.`,
+    C: `You implemented ${implCount} measures, but the food system still faces significant challenges. Some indicators fell into critical (red) territory. Real-world transformation requires comprehensive action across all five policy packages: Diets, Livelihoods, Biosphere, Agriculture, and Cross-Sector.`,
+    D: `With only ${implCount} measures implemented, the food system remained largely on a business-as-usual trajectory. The baseline scenario projects continued biodiversity loss, rising obesity, and warming beyond 2°C. Transformative change requires acting on all fronts — and starting early.`,
+  };
+  const retiredMsg = `Public support collapsed in ${retiredYear} and you were forced from office after ${implCount} policy actions. Your successor inherited a food system mid-transformation. Early political capital is precious — prioritise measures that build public support before tackling the hardest reforms.`;
+  document.getElementById('fin-msg').textContent = state.retired ? retiredMsg : (msgs[grade] || msgs.D);
+
+  setScreen('screen-final');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+function clamp(v){ return Math.max(0, Math.min(100, v)); }  // popularity only
+
+// Format an indicator value for display: round to sensible precision + append unit
+function fmtVal(val, d) {
+  const u = d.unit || '';
+  let v;
+  if(Math.abs(val) >= 100)      v = Math.round(val);
+  else if(Math.abs(val) >= 10)  v = Math.round(val * 10) / 10;
+  else                          v = Math.round(val * 100) / 100;
+  return `${v} <span style="font-size:.7em;color:#8b949e">${u}</span>`;
+}
+
+function setScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startGame() {
+  setScreen('screen-ssp');
+}
+
+function selectSSP(n) {
+  // Highlight selected card briefly before transitioning
+  document.querySelectorAll('.ssp-card').forEach(c => c.classList.remove('selected'));
+  const cls = ['ssp-easy','ssp-medium','ssp-hard'][n-1];
+  const card = document.querySelector('.ssp-card.' + cls);
+  if(card) card.classList.add('selected');
+  setTimeout(() => {
+    initState(n);
+    setScreen('screen-game');
+    renderGame();
+    requestAnimationFrame(() => startTutorial());
+  }, 220);
+}
+
+function resetGame() {
+  setScreen('screen-intro');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TUTORIAL
+// ═══════════════════════════════════════════════════════════════
+
+const TUTORIAL_STEPS = [
+  {
+    sel: null,
+    title: '👋 Welcome to FoodSystem2050!',
+    body: 'This quick tour explains the game screen. Use <strong>Next</strong> to continue, or <strong>Skip</strong> to start playing right away.',
+  },
+  {
+    sel: '#game-header',
+    title: '📅 Year & Round',
+    body: 'You play <strong>6 rounds</strong>, each covering 5 years from 2025 to 2050. The progress dots track completed rounds. The current year is shown on the left.',
+    pos: 'bottom',
+  },
+  {
+    sel: '#h-budget',
+    title: '🎯 Policy Points',
+    body: 'Your spending budget for this round. Each measure costs policy points. <strong>Unspent points carry over</strong> to the next round — save up for expensive reforms.',
+    pos: 'bottom',
+  },
+  {
+    sel: '#h-pop',
+    title: '👥 Popularity',
+    body: 'Your political mandate. It rises when outcomes improve and falls when they worsen. <strong>Higher popularity = more policy points</strong> next round. Fall below 20 and you\'re forced to retire.',
+    pos: 'bottom',
+  },
+  {
+    sel: '#indicators-grid',
+    title: '📊 Outcome Indicators',
+    body: 'These charts show 16 food system indicators across health, environment, livelihoods, and climate. <strong>Green = good, red = critical.</strong> Each chart shows historical trends and a 2050 projection. <em>Scroll down</em> to see all indicators.',
+    pos: 'right',
+  },
+  {
+    sel: '#measures-list',
+    title: '🎛️ Policy Measures',
+    body: '<strong>Click a card</strong> to select a measure and deduct its cost from your policy points. Click again to deselect. Buying the same measure in later rounds costs progressively more. <em>Scroll down</em> to browse all policy categories.',
+    pos: 'left',
+  },
+  {
+    sel: '#end-round-bar',
+    title: '⏩ End the Round',
+    body: 'When you\'re done selecting measures, click here to advance to the next period. The bar above the button shows a <strong>forecast of your popularity change</strong> based on your current selections.',
+    pos: 'top',
+  },
+];
+
+let tutStep = 0;
+
+function startTutorial() {
+  tutStep = 0;
+  document.getElementById('tutorial-overlay').style.display = 'block';
+  showTutStep();
+}
+
+function showTutStep() {
+  const step = TUTORIAL_STEPS[tutStep];
+  document.getElementById('tut-title').innerHTML   = step.title;
+  document.getElementById('tut-body').innerHTML    = step.body;
+  document.getElementById('tut-counter').textContent = `${tutStep + 1} / ${TUTORIAL_STEPS.length}`;
+  document.getElementById('tut-next-btn').textContent =
+    tutStep >= TUTORIAL_STEPS.length - 1 ? '🚀 Start Playing' : 'Next →';
+
+  const spot = document.getElementById('tut-spotlight');
+  const tip  = document.getElementById('tut-tip');
+  const PAD  = 6, TW = 298;
+
+  if (!step.sel) {
+    spot.style.display = 'none';
+    tip.style.top = '50%'; tip.style.left = '50%';
+    tip.style.transform = 'translate(-50%,-50%)';
+    return;
+  }
+  tip.style.transform = '';
+
+  const el = document.querySelector(step.sel);
+  if (!el) { spot.style.display = 'none'; return; }
+  const r = el.getBoundingClientRect();
+
+  spot.style.display = 'block';
+  spot.style.left   = (r.left   - PAD) + 'px';
+  spot.style.top    = (r.top    - PAD) + 'px';
+  spot.style.width  = (r.width  + PAD * 2) + 'px';
+  spot.style.height = (r.height + PAD * 2) + 'px';
+
+  const pos = step.pos || 'bottom';
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (pos === 'bottom') {
+    tip.style.top  = (r.bottom + PAD + 10) + 'px';
+    tip.style.left = Math.max(8, Math.min(r.left, vw - TW - 8)) + 'px';
+  } else if (pos === 'top') {
+    tip.style.top  = Math.max(8, r.top - PAD - 10 - 170) + 'px';
+    tip.style.left = Math.max(8, Math.min(r.left, vw - TW - 8)) + 'px';
+  } else if (pos === 'right') {
+    tip.style.top  = Math.max(8, Math.min(r.top, vh - 200)) + 'px';
+    tip.style.left = Math.min(r.right + PAD + 10, vw - TW - 8) + 'px';
+  } else if (pos === 'left') {
+    tip.style.top  = Math.max(8, Math.min(r.top, vh - 200)) + 'px';
+    tip.style.left = Math.max(8, r.left - TW - PAD - 10) + 'px';
+  }
+}
+
+function tutNext() {
+  tutStep++;
+  if (tutStep >= TUTORIAL_STEPS.length) { closeTutorial(); return; }
+  showTutStep();
+}
+
+function closeTutorial() {
+  document.getElementById('tutorial-overlay').style.display = 'none';
+}
+
+// Init — load CSV data, then initialise state
+loadData();
+</script>
+</body>
+</html>
