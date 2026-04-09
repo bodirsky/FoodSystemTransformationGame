@@ -27,8 +27,3 @@ HumanDevelop,🎓 Equitable Human Development,Cross-Sector,0,"Faster and more eq
 EnergyTrans,⚡ Energy Transition,Cross-Sector,0,Transform energy industry and transport to stay within 1.5°C budget.,-1,0,0,0,1,146,19,0,81,0,-0.03,-0.03,6,19,0.1,-0.1,-2,
 Bioplastics,🌱 Bioplastics,Cross-Sector,0,Use agricultural feedstocks to replace fossil-based plastics and packaging.,-1,0,0,0,0,26,3,0,17,-0.01,-0.01,0,2,5,0.2,0,0,
 TimberCities,🏗️ Timber Cities,Cross-Sector,0,Mass timber construction sequesters carbon in buildings replacing concrete and steel.,0,0,0,0,0,26,0,0,21,-0.02,-0.03,0,0,2,-0.2,0,0,
-SynDiets,✨ Diet Package Synergy,Synergy,0,Co-benefits of a comprehensive diet shift: interacting demand changes reinforce each other beyond individual measures.,0,-4,-3,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,Diets=4
-SynBiosphere,✨ Biosphere Package Synergy,Synergy,0,Nature fully protected: landscape connectivity and reduced fragmentation amplify biodiversity gains.,0,0,0,0,0,0,0,0,2,0.08,0.08,0.05,0,0,0,0,0,Biosphere=3
-SynAgriculture,✨ Agriculture Package Synergy,Synergy,0,Farming in ecological balance: combined precision farming and habitat measures cut nitrogen and water pressure.,0,0,0,0,0,0,0,0,0,0,0,0,-5,-3,0,0,0,Agriculture=4
-SynCrossSector,✨ Cross-Sector Synergy,Synergy,0,System-wide transformation: energy and demographic transitions reduce food-system emissions and industry capture.,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-3,-1,0,Cross-Sector=2
-SynFull,🌟 Full Integration Synergy,Synergy,0,All packages combined: co-benefits amplify across demand supply biosphere and governance dimensions.,0,-3,-2,-1,-2,0,0,0,0,0.05,0.05,0,-3,0,-2,-0.5,0,"Diets=1,Biosphere=1,Agriculture=1,Livelihoods=1,Cross-Sector=1"

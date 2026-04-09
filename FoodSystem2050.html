@@ -87,17 +87,6 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
 #pop-chart-box h4{font-size:.75em;text-transform:uppercase;letter-spacing:.8px;
   color:#8b949e;margin-bottom:8px}
 
-/* ── SYNERGY PANEL ── */
-#synergy-box{margin-top:12px;background:#161b22;border:1px solid #30363d;
-  border-radius:9px;padding:11px 14px}
-#synergy-box h4{font-size:.75em;text-transform:uppercase;letter-spacing:.8px;
-  color:#8b949e;margin-bottom:8px}
-.syn-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:.82em}
-.syn-badge{padding:2px 8px;border-radius:4px;font-size:.75em;font-weight:700;
-  border:1px solid}
-.syn-on{color:#58d68d;background:rgba(88,214,141,.12);border-color:rgba(88,214,141,.35)}
-.syn-off{color:#484f58;background:rgba(72,79,88,.1);border-color:rgba(72,79,88,.3)}
-.syn-desc{color:#8b949e;font-size:.95em}
 
 /* ── MEASURE CARDS ── */
 .cat-section{margin-bottom:10px}
@@ -545,7 +534,6 @@ const CAT_META = {
   'Cross-Sector': { icon:'🌍', color:'#bc8cff' },
 };
 
-let SYNERGIES = [];  // populated from measures.csv synergy rows by loadData()
 
 const NARRATIVES = [
   // round 0→1  (shown after round 1 ends)
@@ -644,18 +632,6 @@ async function loadData() {
       .filter(r => !r.synergy || !r.synergy.trim())
       .map(r => ({ id:r.id, name:r.name, cat:r.cat, cost:parseInt(r.cost), effects:parseEffects(r), desc:r.desc, popEffect:parseFloat(r.popularity)||0 }));
 
-    // Parse synergy trigger string: "Diets=4,Biosphere=1" → [{cat,min}, ...]
-    SYNERGIES = mRows
-      .filter(r => r.synergy && r.synergy.trim())
-      .map(r => ({
-        triggers: r.synergy.trim().split(',').map(t => {
-          const [cat, n] = t.trim().split('=');
-          return { cat: cat.trim(), min: parseInt(n) || 1 };
-        }),
-        bonus: parseEffects(r),
-        label: r.name,
-        desc:  r.desc,
-      }));
 
     document.getElementById('load-overlay').style.display = 'none';
     initState();
@@ -1113,30 +1089,6 @@ function renderIndicators() {
   }).join('');
 }
 
-function renderSynergies() {
-  const rows = document.getElementById('synergy-rows');
-  rows.innerHTML = SYNERGIES.map(s => {
-    const active = isSynergyActive(s);
-    const cls = active ? 'syn-on' : 'syn-off';
-    return `<div class="syn-row">
-      <span class="syn-badge ${cls}">${active?'✓':' '} ${s.label}</span>
-      <span class="syn-desc">${s.desc}</span>
-    </div>`;
-  }).join('');
-}
-
-function isSynergyActive(s) {
-  return s.triggers.every(t => {
-    const count = MEASURES.filter(m =>
-      m.cat === t.cat && (
-        (state.purchaseCounts[m.id]||0) +
-        (state.selectedCounts[m.id]||0) +
-        (state.wildcardCounts[m.id]||0)
-      ) >= 1
-    ).length;
-    return count >= t.min;
-  });
-}
 
 function renderMeasures() {
   const cats = [...new Set(MEASURES.map(m=>m.cat))].filter(c => c !== 'Cross-Sector');
@@ -1325,19 +1277,6 @@ function endRound() {
     state.wildcardCounts[id] = (state.wildcardCounts[id] || 0) + 1;
   });
 
-  // 4. Synergy bonuses — also attributed to player
-  SYNERGIES.forEach(s => {
-    if(isSynActive(s, state.purchaseCounts)) {
-      Object.entries(s.bonus).forEach(([ind,val]) => {
-        const perRound = Math.round(val/6);
-        const def = IND_DEFS.find(d => d.id === ind);
-        state.indicators[ind] = def
-          ? clampInd((state.indicators[ind]||0) + perRound, def)
-          : (state.indicators[ind]||0) + perRound;
-        measureEffects[ind] = (measureEffects[ind]||0) + perRound;
-      });
-    }
-  });
 
   // 5. Calculate popularity delta based on outcomes + direct measure effects
   const popDelta = calcPopularityDelta(directPopEffect);
@@ -1354,14 +1293,6 @@ function endRound() {
   state.selectedCounts = {};
 }
 
-function isSynActive(s, purchaseCounts) {
-  return s.triggers.every(t => {
-    const count = MEASURES.filter(m =>
-      m.cat === t.cat && ((purchaseCounts[m.id]||0) + (state.wildcardCounts[m.id]||0)) >= 1
-    ).length;
-    return count >= t.min;
-  });
-}
 
 function showResult(prev, taken, wildcardList) {
   const year = 2020 + state.round*5;
@@ -1520,12 +1451,6 @@ function nextRound() {
 // ═══════════════════════════════════════════════════════════════
 
 function showFinal() {
-  // Apply end-of-game synergy bonuses (remaining)
-  SYNERGIES.forEach(s => {
-    if(isSynActive(s, state.purchaseCounts)) {
-      // Already applied per-round; give any remainder
-    }
-  });
 
   // Score: voter-weighted average of normalised indicator values (0–100)
   const scoreDefs = IND_DEFS.filter(d => d.id !== 'vestedInterests');
