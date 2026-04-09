@@ -4,7 +4,7 @@ obesity,Obesity,⚖️,million people,400,600,848,127,102.167,77.167,true,850,14
 premMort,Premature Mortality,💔,million/yr,220,240,279,-11.333,9.333,52.167,true,150,300,0.8,Premature deaths attributable to diet-related health risks
 foodExpend,Food Expenditure,🛒,USD/person/yr,330,400,421,15,16,10.667,true,420,530,1.5,Average consumer food expenditure — proxy for food affordability and cost burden
 afoluGHG,AFOLU GHG,🌫️,GtCO₂eq/yr,6,10,11.6,-0.8,-0.2,-0.067,true,0,5,0.7,Agriculture forestry and land-use greenhouse gas emissions — climate forcing from food system
-globalWarm,Global Warming,🌡️,°C,0.76,0.9,1.24,0.128,0.135,0,true,1.5,1.7,1,Projected global mean surface temperature increase rel. to 1951-1980 — climate trajectory
+globalWarm,Global Warming,🌡️,°C,0.76,0.9,1.24,0.128,0.135,0.14,true,1.5,1.7,1,Projected global mean surface temperature increase rel. to 1951-1980 — climate trajectory
 nitrogen,Nitrogen Surplus,😷,Mt N/yr,200,225,239,0.833,9.667,18.333,true,180,240,0.4,"Reactive nitrogen surplus in croplands and from livestock — air, water, atmospheric and soil pollution"
 waterViol,Water Flow Violations,💧,km³/yr,120,140,149,6.333,10,9.5,true,80,140,0.5,Volume of river flow below environmental minimum — freshwater ecosystem health
 croplandBII,Cropland Landscapes,🌾,Biodiv. Intactness Index,72.5,71.5,70.51,-0.177,-0.152,-0.162,false,71,70,0.2,Biodiversity Intactness Index on cropland landscapes — landscapes with high cropping intensity
