@@ -580,8 +580,8 @@ async function loadData() {
   const errEl = document.getElementById('load-error');
   try {
     const [mRes, iRes] = await Promise.all([
-      fetch('measures.csv'),
-      fetch('indicators.csv')
+      fetch('measures.csv?v=' + Date.now()),
+      fetch('indicators.csv?v=' + Date.now())
     ]);
     if (!mRes.ok || !iRes.ok) throw new Error('HTTP error');
     const [mText, iText] = await Promise.all([mRes.text(), iRes.text()]);
@@ -593,6 +593,8 @@ async function loadData() {
         name:           r.name,
         emoji:          r.emoji,
         unit:           r.unit,
+        value2000:      parseFloat(r.value2000),
+        value2010:      parseFloat(r.value2010),
         start:          parseFloat(r.start),
         trendSSP1:      parseFloat(r.trendSSP1),
         trendSSP2:      parseFloat(r.trendSSP2),
@@ -926,8 +928,7 @@ function makeChartSVG(d) {
   // ── Y-axis range in actual units ─────────────────────────────
   const proj2050lo = d.start + d.trendSSP1 * 6;
   const proj2050hi = d.start + d.trendSSP3 * 6;
-  const back2000   = d.start - d.trendSSP2 * 4;
-  const allVals = [d.start, d.goodThreshold, d.badThreshold, proj2050lo, proj2050hi, back2000];
+  const allVals = [d.value2000, d.start, d.goodThreshold, d.badThreshold, proj2050lo, proj2050hi].filter(v => !isNaN(v));
   const rawLo = Math.min(...allVals), rawHi = Math.max(...allVals);
   const span  = rawHi - rawLo || Math.abs(d.start) * 0.2 || 1;
   const yMin  = rawLo - span * 0.12;
@@ -972,10 +973,12 @@ function makeChartSVG(d) {
   }
 
   // ── Data series ──────────────────────────────────────────────
-  // 1. Synthetic pre-game history 2000–2020
-  const synthPts = [];
-  for(let y = 2000; y <= 2020; y += 5)
-    synthPts.push([xPos(y), yPos(d.start + (y - 2020) / 5 * d.trendSSP2)]);
+  // 1. Historical pre-game data 2000–2020
+  const synthPts = [
+    ...(isNaN(d.value2000) ? [] : [[xPos(2000), yPos(d.value2000)]]),
+    ...(isNaN(d.value2010) ? [] : [[xPos(2010), yPos(d.value2010)]]),
+    [xPos(2020), yPos(d.start)],
+  ];
 
   // 2. Actual game history (2020 → current)
   const histPts = state.history.map(h => [xPos(h.year), yPos(h.indicators[d.id])]);
