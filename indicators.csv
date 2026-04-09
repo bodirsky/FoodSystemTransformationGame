@@ -1,17 +1,17 @@
 id,name,emoji,unit,start,trendSSP1,trendSSP2,trendSSP3,lowerBetter,goodThreshold,badThreshold,voterWeight,desc
-poverty,Poverty,👐 ,million people,2104,-311,-209,13,true,500,1000,2.5,People living below the international poverty line — food security and purchasing power
 underweight,Undernutrition,🍚,million people,730,-33,-15,17,true,100,500,2.2,People with insufficient calorie and nutrient intake — hunger and underweight prevalence
 obesity,Overweight/Obesity,⚖️,million people,848,127,102,77,true,850,1400,1,People with overweight or obesity — diet quality and nutrition transition
 premMort,Premature Mortality,💔,million/yr,279,-11,9,52,true,150,300,0.8,Premature deaths attributable to diet-related diseases
 foodExpend,Food Expenditure,🛒,USD/person/yr,428,14,15,9,true,420,530,1.5,Average consumer food expenditure — proxy for food affordability and cost burden
+afoluGHG,AFOLU GHG,🌫️,GtCO₂eq/yr,11.9,-0.85,-0.25,-0.13,true,0,5,0.7,Agriculture forestry and land-use greenhouse gas emissions — climate forcing from food system
+globalWarm,Global Warming,🌡️,°C,1.24,0.13,0.13,0.21,true,1.5,1.7,1,Projected global mean surface temperature increase above pre-industrial — climate trajectory
+nitrogen,Nitrogen Surplus,😷,Mt N/yr,239,0.67,9.67,18.33,true,180,240,0.4,Reactive nitrogen surplus in croplands and from livestock — eutrophication and pollution
+waterViol,Water Flow Violations,💧,km³/yr,136,8,7.67,9.5,true,80,140,0.5,Volume of river flow below environmental minimum — freshwater ecosystem health
+croplandBII,Cropland Landscapes,🌾,Biodiv. Intactness Index,70.71,-0.17,-0.15,-0.16,false,71,70,0.2,Biodiversity Intactness Index on croplands — species abundance relative to pristine state
+hotspotBII,Hotspot Landscapes,🦋,Biodiv. Intactness Index,91.43,-0.11,-0.11,-0.11,false,91.5,91,0.3,Biodiversity Intactness Index in biodiversity hotspots — most critical ecosystems
+cropareaDiv,Croparea Diversity,🌈,Shannon index,2.2,-0.01,-0.015,-0.025,false,2.3,2,0.2,Shannon diversity index of harvested crop area — variety of crops grown globally
+bioeconomy,Bioeconomy,🌱,bn USD/yr,644,1,18,32,false,900,644,0.4,Value of bio-based products and services — contribution of agriculture beyond food
 prodCosts,Production Costs,💸,bn USD/yr,3285,176,225,237,true,3800,5000,0.5,Global food production costs — efficiency and price pressure on supply chains
 agEmploy,Ag. Employment,👷,million workers,841,-92,-65,-16,false,550,300,1.5,Agricultural labour demand — rural livelihoods and structural employment transition
 agWages,Ag. Wages,💵,USD/hour,1.46,0.74,0.43,0.21,false,6,2,0.5,Average agricultural wages — farm worker income relative to 2020 baseline
-bioeconomy,Bioeconomy,🌱,bn USD/yr,644,1,18,32,false,900,644,0.4,Value of bio-based products and services — contribution of agriculture beyond food
-croplandBII,Cropland BII,🌾,%,70.71,-0.17,-0.15,-0.16,false,71,70,0.2,Biodiversity Intactness Index on croplands — species abundance relative to pristine state
-hotspotBII,Hotspot BII,🦋,%,91.43,-0.11,-0.11,-0.11,false,91.5,91,0.3,Biodiversity Intactness Index in biodiversity hotspots — most critical ecosystems
-cropareaDiv,Croparea Diversity,🌈,Shannon index,2.2,-0.01,-0.015,-0.025,false,2.3,2,0.2,Shannon diversity index of harvested crop area — variety of crops grown globally
-nitrogen,Nitrogen Surplus,😷,Mt N/yr,239,0.67,9.67,18.33,true,180,240,0.4,Reactive nitrogen surplus in croplands and from livestock — eutrophication and pollution
-waterViol,Water Flow Violations,💧,km³/yr,136,8,7.67,9.5,true,80,140,0.5,Volume of river flow below environmental minimum — freshwater ecosystem health
-afoluGHG,AFOLU GHG,🌫️,GtCO₂eq/yr,11.9,-0.85,-0.25,-0.13,true,0,5,0.7,Agriculture forestry and land-use greenhouse gas emissions — climate forcing from food system
-globalWarm,Global Warming,🌡️,°C,1.24,0.13,0.13,0.21,true,1.5,1.7,1,Projected global mean surface temperature increase above pre-industrial — climate trajectory
+poverty,Poverty,👐 ,million people,2104,-311,-209,13,true,500,1000,2.5,People living below the international poverty line — food security and purchasing power

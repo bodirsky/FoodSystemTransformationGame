@@ -1118,12 +1118,25 @@ function renderMeasures() {
       const popChip = m.popEffect !== 0
         ? `<span class="chip ${m.popEffect>0?'chip-p':'chip-n'}">${m.popEffect>0?'+':''}${m.popEffect} Popularity</span>`
         : '';
-      const chips = popChip + Object.entries(m.effects).filter(([ind]) => ind !== 'vestedInterests').map(([ind,val]) => {
-        const lbl = IND_LABELS[ind] || ind;
-        const def = IND_DEFS.find(d => d.id === ind);
-        const isGood = (def && def.lowerBetter) ? val < 0 : val > 0;
-        return `<span class="chip ${isGood?'chip-p':'chip-n'}">${val>0?'+':''}${val} ${lbl}</span>`;
-      }).join('');
+      const DISPLAY_THRESH = { prodCosts: 0.005, afoluGHG: 0.005, agEmploy: 0.015, foodExpend: 0.015 }; // per-indicator overrides (fraction of range)
+      const chips = popChip + Object.entries(m.effects)
+        .filter(([ind, val]) => {
+          if (ind === 'vestedInterests') return false;
+          const def = IND_DEFS.find(d => d.id === ind);
+          if (!def) return true;
+          const range = Math.abs(def.goodThreshold - def.badThreshold);
+          const thresh = DISPLAY_THRESH[ind] ?? 0.05;
+          return range === 0 || Math.abs(val) / range >= thresh;
+        })
+        .map(([ind, val]) => {
+          const lbl = IND_LABELS[ind] || ind;
+          const def = IND_DEFS.find(d => d.id === ind);
+          const isGood = (def && def.lowerBetter) ? val < 0 : val > 0;
+          const disp = Math.abs(val) >= 100 ? Math.round(val)
+                     : Math.abs(val) >= 10  ? Math.round(val * 10) / 10
+                     :                        Math.round(val * 100) / 100;
+          return `<span class="chip ${isGood?'chip-p':'chip-n'}">${val>0?'+':''}${disp} ${lbl}</span>`;
+        }).join('');
 
       const countBadge = selCount > 0 ? `<span class="sel-count">×${selCount}</span>` : '';
       const addBtn = isSel && canAfford
