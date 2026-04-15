@@ -285,14 +285,14 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
 /* ── MOBILE TILE STYLES ── */
 .mob-tile{flex-direction:column;align-items:center;justify-content:center;
   background:#161b22;border:1px solid #30363d;border-radius:9px;
-  padding:8px 5px 7px;cursor:pointer;text-align:center;position:relative;
-  width:74px;min-height:78px;transition:border-color .15s,background .15s;user-select:none}
+  padding:8px 6px 7px;cursor:pointer;text-align:center;position:relative;
+  width:88px;min-height:80px;transition:border-color .15s,background .15s;user-select:none}
 .mob-tile:active{background:#1c2128}
 .mob-tile.mob-sel{border-color:#58d68d;background:rgba(88,214,141,.08)}
 .mob-tile.mob-busy{opacity:.35;cursor:not-allowed}
 .mob-tile.mob-prior{border-left:3px solid #444c56}
 .mtile-icon{font-size:1.3em;line-height:1;margin-bottom:4px}
-.mtile-name{font-size:.63em;color:#c9d1d9;line-height:1.25;max-width:66px;
+.mtile-name{font-size:.63em;color:#c9d1d9;line-height:1.25;max-width:80px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   word-break:break-word}
 .mtile-badges{display:flex;gap:3px;align-items:center;justify-content:center;
@@ -1280,9 +1280,9 @@ function renderMeasures() {
       const tilePriorBadge = priorCount > 0 ? `<span class="prior-badge">✓${priorCount}</span>` : '';
       const tileCostBadge  = `<span class="mcost ${isSel?'sel':''}">${nextCost}</span>`;
       // Extract leading emoji from measure name (everything before the first space-preceded letter)
-      const emojiMatch = m.name.match(/^([\p{Emoji}\s]+?)(?=\p{L})/u);
+      const emojiMatch = m.name.match(/^([\p{Extended_Pictographic}\u200D\uFE0F\s]+?)(?=[\p{L}\d])/u);
       const tileEmoji  = emojiMatch ? emojiMatch[1].trim() : meta.icon;
-      const tileName   = m.name.replace(/^[\p{Emoji}\s]+/u, '').trim();
+      const tileName   = m.name.replace(/^[\p{Extended_Pictographic}\u200D\uFE0F\s]+/u, '').trim();
       const mobtile = `<div class="mob-tile ${tileCls}" onclick="openMeasureSheet('${m.id}')">
         <div class="mtile-icon">${tileEmoji}</div>
         <div class="mtile-name">${tileName}</div>
@@ -1403,9 +1403,9 @@ function openMeasureSheet(id) {
   const canAfford  = nextCost <= remaining;
   const isSel      = selCount > 0;
 
-  const mEmojiMatch = m.name.match(/^([\p{Emoji}\s]+?)(?=\p{L})/u);
+  const mEmojiMatch = m.name.match(/^([\p{Extended_Pictographic}\u200D\uFE0F\s]+?)(?=[\p{L}\d])/u);
   document.getElementById('ms-cat-icon').textContent = mEmojiMatch ? mEmojiMatch[1].trim() : (cat.icon || '');
-  document.getElementById('ms-name').textContent     = m.name.replace(/^[\p{Emoji}\s]+/u, '').trim();
+  document.getElementById('ms-name').textContent     = m.name.replace(/^[\p{Extended_Pictographic}\u200D\uFE0F\s]+/u, '').trim();
 
   const repeatStep = priorCount + selCount + 1;
   document.getElementById('ms-cost-badge').textContent =
