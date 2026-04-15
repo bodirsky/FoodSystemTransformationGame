@@ -22,6 +22,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
 .intro-subtitle{font-size:1.1em;color:#8b9e7a;margin-bottom:28px}
 .intro-body{max-width:680px;line-height:1.7;color:#adbac7;margin-bottom:28px;font-size:.95em}
 .intro-features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:800px;margin:0 auto 32px}
+.intro-features.intro-features-5col{grid-template-columns:repeat(5,1fr)}
 .feat{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:14px 12px;text-align:left}
 .feat-icon{font-size:1.6em;margin-bottom:6px}
 .feat-title{font-size:.82em;font-weight:700;color:#c9d1d9;margin-bottom:3px}
@@ -271,11 +272,108 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
 .tip:hover .tip-text{display:block}
 
 @media(max-width:900px){
-  .intro-features{grid-template-columns:1fr 1fr}
+  .intro-features,.intro-features.intro-features-5col{grid-template-columns:1fr 1fr}
   #game-body{flex-direction:column}
   #left-panel,#right-panel{flex:none;width:100%;border-right:none}
   #indicators-grid{grid-template-columns:repeat(2,1fr)}
   #end-round-bar{position:fixed;width:100%;bottom:0;left:0;right:0}
+}
+
+/* ── MOBILE-ONLY ELEMENTS (hidden on desktop) ── */
+#mobile-tabs,.mob-tile,#measure-sheet,#measure-sheet-overlay{display:none}
+
+/* ── MOBILE TILE STYLES ── */
+.mob-tile{flex-direction:column;align-items:center;justify-content:center;
+  background:#161b22;border:1px solid #30363d;border-radius:9px;
+  padding:8px 5px 7px;cursor:pointer;text-align:center;position:relative;
+  width:74px;min-height:78px;transition:border-color .15s,background .15s;user-select:none}
+.mob-tile:active{background:#1c2128}
+.mob-tile.mob-sel{border-color:#58d68d;background:rgba(88,214,141,.08)}
+.mob-tile.mob-busy{opacity:.35;cursor:not-allowed}
+.mob-tile.mob-prior{border-left:3px solid #444c56}
+.mtile-icon{font-size:1.3em;line-height:1;margin-bottom:4px}
+.mtile-name{font-size:.63em;color:#c9d1d9;line-height:1.25;max-width:66px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word}
+.mtile-badges{display:flex;gap:3px;align-items:center;justify-content:center;
+  flex-wrap:wrap;margin-top:4px}
+
+/* ── MEASURE BOTTOM SHEET ── */
+#measure-sheet-overlay{position:fixed;inset:0;background:rgba(13,17,23,.65);z-index:500}
+#measure-sheet{position:fixed;bottom:0;left:0;right:0;z-index:501;
+  background:#161b22;border-top:1px solid #30363d;border-radius:14px 14px 0 0;
+  padding:6px 18px 36px;transform:translateY(100%);transition:transform .28s ease;
+  max-height:78vh;overflow-y:auto}
+#measure-sheet.open{transform:translateY(0)}
+.ms-handle{width:36px;height:4px;background:#30363d;border-radius:2px;margin:0 auto 14px}
+#ms-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+#ms-cat-icon{font-size:1.5em}
+#ms-name{font-size:1.05em;font-weight:700;color:#c9d1d9;flex:1;line-height:1.3}
+#ms-cost-badge{background:#30363d;color:#f0b429;border-radius:5px;
+  padding:3px 9px;font-size:.82em;font-weight:700;white-space:nowrap}
+#ms-desc{font-size:.85em;color:#8b949e;line-height:1.55;margin-bottom:10px}
+#ms-fx{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+#ms-repeat-note{font-size:.8em;color:#8b949e;margin-bottom:12px;font-style:italic}
+.ms-buy-btn{width:100%;background:#1f6feb;color:#fff;border:none;
+  padding:13px;font-size:1em;border-radius:8px;cursor:pointer;
+  font-weight:700;transition:background .2s;min-height:44px}
+.ms-buy-btn:hover{background:#388bfd}
+.ms-buy-btn.ms-desel{background:transparent;color:#f85149;
+  border:1px solid rgba(248,81,73,.45)}
+.ms-buy-btn:disabled{background:#21262d;color:#8b949e;cursor:not-allowed;border:none}
+
+/* ── MOBILE TAB BAR ── */
+#mobile-tabs{background:#161b22;border-bottom:1px solid #30363d;flex-shrink:0;z-index:10}
+.mob-tab{flex:1;background:none;border:none;color:#8b949e;padding:11px 0;
+  font-size:.9em;font-weight:600;cursor:pointer;
+  border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.mob-tab.active{color:#c9d1d9;border-bottom-color:#388bfd}
+
+@media(max-width:520px){
+  /* header: drop decorative/redundant elements */
+  #game-header .title{display:none}
+  #h-ssp{display:none}
+  #round-dots{display:none}
+  .hstat{min-width:46px}
+  .hstat .lbl{font-size:.60em}
+  .hstat .val{font-size:1.05em}
+  .pop-header-widget{min-width:80px}
+  .pop-header-mandate{display:none}
+  #game-header{gap:8px;padding:8px 10px}
+
+  /* game layout: natural scroll per tab */
+  #screen-game{height:auto;overflow:visible}
+  #game-body{flex-direction:column;height:auto}
+  #left-panel,#right-panel{flex:none;width:100%;border-right:none;
+    overflow-y:visible;height:auto}
+  #right-panel{display:flex;flex-direction:column}
+  #measures-scroll{padding-bottom:90px}
+  #end-round-bar{width:100%;left:0;right:0}
+
+  /* show tab bar, hide inactive panel */
+  #mobile-tabs{display:flex}
+  .mob-hidden{display:none !important}
+
+  /* measure tiles: replace 2-col card grid */
+  .mcard{display:none}
+  .mob-tile{display:flex}
+  .cat-body{display:flex;flex-wrap:wrap;gap:8px;padding:10px;
+    background:transparent;border:none;border-top:1px solid #30363d}
+  .cat-body.collapsed{display:none}
+
+  /* other screens */
+  .intro-features,.intro-features.intro-features-5col{grid-template-columns:1fr}
+  .final-indicators{grid-template-columns:repeat(3,1fr)}
+  .changes-grid{grid-template-columns:1fr}
+
+  /* buttons */
+  .btn-primary,.btn-secondary,.btn-end-round{min-height:44px}
+
+  /* tutorial tip: full-width on mobile */
+  #tut-tip{width:calc(100vw - 32px) !important;box-sizing:border-box}
+
+  /* touch tooltips */
+  .tip:focus .tip-text,.tip:active .tip-text{display:block}
 }
 
 /* ── SSP SELECTION ── */
@@ -321,7 +419,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
     how many policy points you receive each round. Voters reward visible improvements and
     punish crises, so you must balance long-term sustainability with near-term approval.
   </div>
-  <div class="intro-features" style="grid-template-columns:repeat(5,1fr)">
+  <div class="intro-features intro-features-5col">
     <div class="feat"><div class="feat-icon">🍽️</div>
       <div class="feat-title">Health</div>
       <div class="feat-desc">Fight hunger AND reduce obesity simultaneously</div></div>
@@ -430,6 +528,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
   </div>
 
   <div id="game-body">
+    <div id="mobile-tabs">
+      <button id="tab-state"  class="mob-tab" onclick="showTab('state')">📊 Outcomes</button>
+      <button id="tab-policy" class="mob-tab" onclick="showTab('policy')">🎛️ Policies</button>
+    </div>
     <!-- LEFT: indicators -->
     <div id="left-panel">
       <div class="panel-head">📊 System State</div>
@@ -500,6 +602,21 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
       <button class="btn-secondary" onclick="resetGame()">Play Again</button>
     </div>
   </div>
+</div>
+
+<!-- ═══════════════════════════ MEASURE BOTTOM SHEET (mobile) ═══════════════════════════ -->
+<div id="measure-sheet-overlay" onclick="closeMeasureSheet()"></div>
+<div id="measure-sheet">
+  <div class="ms-handle"></div>
+  <div id="ms-header">
+    <span id="ms-cat-icon"></span>
+    <span id="ms-name"></span>
+    <span id="ms-cost-badge"></span>
+  </div>
+  <div id="ms-desc"></div>
+  <div id="ms-fx"></div>
+  <div id="ms-repeat-note"></div>
+  <button class="ms-buy-btn" id="ms-buy-btn" onclick="sheetBuy()"></button>
 </div>
 
 <div id="tutorial-overlay">
@@ -838,6 +955,7 @@ function renderGame() {
   renderPopChart();
   renderMeasures();
   renderEndBtn();
+  if (window.innerWidth <= 520) showTab('policy');
 }
 
 function renderPopChart() {
@@ -1147,7 +1265,7 @@ function renderMeasures() {
       const priorBadge = priorCount > 0
         ? `<span class="prior-badge" title="Bought ${priorCount}× in past rounds">✓${priorCount}</span>` : '';
 
-      return `<div class="mcard ${cls}" onclick="toggleMeasure('${m.id}')">
+      const mcard = `<div class="mcard ${cls}" onclick="toggleMeasure('${m.id}')">
         <div class="mhead">
           <span class="mname">${m.name}</span>
           <span class="mcost-row">${priorBadge}${countBadge}${addBtn}<span class="mcost ${isSel?'sel':''}">${costDisplay}${repeatNote}</span></span>
@@ -1155,6 +1273,23 @@ function renderMeasures() {
         <div class="mdesc">${m.desc}</div>
         <div class="mfx">${chips}</div>
       </div>`;
+
+      const tileCls = (isSel ? 'mob-sel' : (!canAfford && !isSel) ? 'mob-busy' : '') +
+                      (priorCount > 0 && !isSel ? ' mob-prior' : '');
+      const tileCountBadge = selCount > 0 ? `<span class="sel-count">×${selCount}</span>` : '';
+      const tilePriorBadge = priorCount > 0 ? `<span class="prior-badge">✓${priorCount}</span>` : '';
+      const tileCostBadge  = `<span class="mcost ${isSel?'sel':''}">${nextCost}</span>`;
+      // Extract leading emoji from measure name (everything before the first space-preceded letter)
+      const emojiMatch = m.name.match(/^([\p{Emoji}\s]+?)(?=\p{L})/u);
+      const tileEmoji  = emojiMatch ? emojiMatch[1].trim() : meta.icon;
+      const tileName   = m.name.replace(/^[\p{Emoji}\s]+/u, '').trim();
+      const mobtile = `<div class="mob-tile ${tileCls}" onclick="openMeasureSheet('${m.id}')">
+        <div class="mtile-icon">${tileEmoji}</div>
+        <div class="mtile-name">${tileName}</div>
+        <div class="mtile-badges">${tilePriorBadge}${tileCountBadge}${tileCostBadge}</div>
+      </div>`;
+
+      return mcard + mobtile;
     }).join('');
 
     return `<div class="cat-section">
@@ -1237,6 +1372,140 @@ function addPurchase(id, e) {
 function toggleCat(cat) {
   state.collapsed[cat] = !state.collapsed[cat];
   renderMeasures();
+}
+
+// ── Mobile tab switcher ─────────────────────────────────────────
+function showTab(name) {
+  const lp = document.getElementById('left-panel');
+  const rp = document.getElementById('right-panel');
+  if (!lp || !rp) return;
+  lp.classList.toggle('mob-hidden', name !== 'state');
+  rp.classList.toggle('mob-hidden', name !== 'policy');
+  const ts = document.getElementById('tab-state');
+  const tp = document.getElementById('tab-policy');
+  if (ts) ts.classList.toggle('active', name === 'state');
+  if (tp) tp.classList.toggle('active', name === 'policy');
+}
+
+// ── Mobile measure bottom sheet ─────────────────────────────────
+let _sheetMid = null;
+
+function openMeasureSheet(id) {
+  const m = MEASURES.find(m => m.id === id);
+  if (!m) return;
+  _sheetMid = id;
+
+  const cat      = CAT_META[m.cat] || {};
+  const selCount = state.selectedCounts[id] || 0;
+  const priorCount = state.purchaseCounts[id] || 0;
+  const remaining  = state.budget - selectedCost();
+  const nextCost   = nextUnitCost(m);
+  const canAfford  = nextCost <= remaining;
+  const isSel      = selCount > 0;
+
+  const mEmojiMatch = m.name.match(/^([\p{Emoji}\s]+?)(?=\p{L})/u);
+  document.getElementById('ms-cat-icon').textContent = mEmojiMatch ? mEmojiMatch[1].trim() : (cat.icon || '');
+  document.getElementById('ms-name').textContent     = m.name.replace(/^[\p{Emoji}\s]+/u, '').trim();
+
+  const repeatStep = priorCount + selCount + 1;
+  document.getElementById('ms-cost-badge').textContent =
+    nextCost + ' pts' + ((priorCount + selCount) > 0 ? '  ×' + repeatStep : '');
+
+  document.getElementById('ms-desc').textContent = m.desc;
+
+  const DISPLAY_THRESH = { prodCosts:0.005, afoluGHG:0.005, agEmploy:0.015, foodExpend:0.015 };
+  const popChip = m.popEffect !== 0
+    ? `<span class="chip ${m.popEffect>0?'chip-p':'chip-n'}">${m.popEffect>0?'+':''}${m.popEffect} Popularity</span>`
+    : '';
+  const chips = popChip + Object.entries(m.effects)
+    .filter(([ind, val]) => {
+      if (ind === 'vestedInterests') return false;
+      const def = IND_DEFS.find(d => d.id === ind);
+      if (!def) return true;
+      const range = Math.abs(def.goodThreshold - def.badThreshold);
+      const thresh = DISPLAY_THRESH[ind] ?? 0.05;
+      return range === 0 || Math.abs(val) / range >= thresh;
+    })
+    .map(([ind, val]) => {
+      const lbl  = IND_LABELS[ind] || ind;
+      const def  = IND_DEFS.find(d => d.id === ind);
+      const isGood = (def && def.lowerBetter) ? val < 0 : val > 0;
+      const disp = Math.abs(val) >= 100 ? Math.round(val)
+                 : Math.abs(val) >= 10  ? Math.round(val * 10) / 10
+                 :                        Math.round(val * 100) / 100;
+      return `<span class="chip ${isGood?'chip-p':'chip-n'}">${val>0?'+':''}${disp} ${lbl}</span>`;
+    }).join('');
+  document.getElementById('ms-fx').innerHTML = chips;
+
+  document.getElementById('ms-repeat-note').textContent =
+    priorCount > 0 ? `Purchased ${priorCount}× in previous rounds.` : '';
+
+  const btn = document.getElementById('ms-buy-btn');
+  if (isSel) {
+    const canAddMore = canAfford;
+    btn.innerHTML = `
+      <div style="display:flex;gap:8px">
+        <button onclick="sheetRemove()" style="flex:1;background:transparent;color:#f85149;border:1px solid rgba(248,81,73,.45);border-radius:7px;padding:11px 6px;font-size:.9em;font-weight:700;cursor:pointer;min-height:44px">✕ Remove one</button>
+        <button onclick="sheetAdd()" ${canAddMore?'':'disabled'} style="flex:2;background:${canAddMore?'#1f6feb':'#21262d'};color:${canAddMore?'#fff':'#8b949e'};border:none;border-radius:7px;padding:11px 6px;font-size:.9em;font-weight:700;cursor:${canAddMore?'pointer':'not-allowed'};min-height:44px">＋ Add another (${nextCost} pts)</button>
+      </div>`;
+    btn.className = 'ms-buy-btn';
+    btn.disabled  = false;
+    btn.onclick   = null;
+    btn.style.padding = '0';
+    btn.style.background = 'none';
+  } else if (!canAfford) {
+    btn.innerHTML = '';
+    btn.textContent = `Not enough points (need ${nextCost})`;
+    btn.className   = 'ms-buy-btn';
+    btn.disabled    = true;
+    btn.onclick     = sheetBuy;
+    btn.style.padding = '';
+    btn.style.background = '';
+  } else {
+    btn.innerHTML = '';
+    btn.textContent = `Select — ${nextCost} pts`;
+    btn.className   = 'ms-buy-btn';
+    btn.disabled    = false;
+    btn.onclick     = sheetBuy;
+    btn.style.padding = '';
+    btn.style.background = '';
+  }
+
+  const overlay = document.getElementById('measure-sheet-overlay');
+  const sheet   = document.getElementById('measure-sheet');
+  overlay.style.display = 'block';
+  sheet.style.display   = 'block';
+  if (!sheet.classList.contains('open')) {
+    requestAnimationFrame(() => sheet.classList.add('open'));
+  }
+}
+
+function closeMeasureSheet() {
+  const sheet = document.getElementById('measure-sheet');
+  sheet.classList.remove('open');
+  document.getElementById('measure-sheet-overlay').style.display = 'none';
+  _sheetMid = null;
+}
+
+function sheetBuy() {
+  if (!_sheetMid) return;
+  toggleMeasure(_sheetMid);  // select (or deselect if already selected)
+  closeMeasureSheet();
+}
+
+function sheetAdd() {
+  if (!_sheetMid) return;
+  addPurchase(_sheetMid, { stopPropagation: () => {} });
+  closeMeasureSheet();
+}
+
+function sheetRemove() {
+  if (!_sheetMid) return;
+  const id = _sheetMid;
+  const cur = state.selectedCounts[id] || 0;
+  if (cur > 0) state.selectedCounts[id] = cur - 1;
+  renderGame();
+  closeMeasureSheet();
 }
 
 function getLow() {
@@ -1621,40 +1890,54 @@ const TUTORIAL_STEPS = [
     pos: 'bottom',
   },
   {
+    sel: '#mobile-tabs',
+    title: '📊 Outcomes & 🎛️ Policies',
+    body: 'Use these tabs to switch views. <strong>Outcomes</strong> shows 16 indicators tracking how the food system is doing. <strong>Policies</strong> is where you select measures each round. You start each round here.',
+    pos: 'bottom',
+    mobileOnly: true,
+  },
+  {
     sel: '#indicators-grid',
     title: '📊 Outcome Indicators',
-    body: 'These charts show 16 food system indicators across health, environment, livelihoods, and climate. <strong>Green = good, red = critical.</strong> Each chart shows historical trends and a 2050 projection. <em>Scroll down</em> to see all indicators.',
+    body: 'These charts show 16 food system indicators across health, environment, livelihoods, and climate. <strong>Green = good, red = critical.</strong> Each chart shows historical trends and a 2050 projection.',
     pos: 'right',
+    tab: 'state',
   },
   {
     sel: '#measures-list',
     title: '🎛️ Policy Measures',
-    body: '<strong>Click a card</strong> to select a measure and deduct its cost from your policy points. Click again to deselect. Buying the same measure in later rounds costs progressively more. <em>Scroll down</em> to browse all policy categories.',
+    body: '<strong>Tap a tile</strong> to see a measure\'s details and select it. Buying the same measure in later rounds costs progressively more. Browse all categories by scrolling.',
     pos: 'left',
+    tab: 'policy',
   },
   {
     sel: '#end-round-bar',
     title: '⏩ End the Round',
     body: 'When you\'re done selecting measures, click here to advance to the next period. The bar above the button shows a <strong>forecast of your popularity change</strong> based on your current selections.',
     pos: 'top',
+    tab: 'policy',
   },
 ];
 
 let tutStep = 0;
+let effectiveTutSteps = [];
 
 function startTutorial() {
+  effectiveTutSteps = TUTORIAL_STEPS.filter(s => !s.mobileOnly || window.innerWidth <= 520);
   tutStep = 0;
   document.getElementById('tutorial-overlay').style.display = 'block';
   showTutStep();
 }
 
 function showTutStep() {
-  const step = TUTORIAL_STEPS[tutStep];
+  const step = effectiveTutSteps[tutStep];
+  // Switch to the correct tab on mobile before positioning
+  if (step.tab && window.innerWidth <= 520) showTab(step.tab);
   document.getElementById('tut-title').innerHTML   = step.title;
   document.getElementById('tut-body').innerHTML    = step.body;
-  document.getElementById('tut-counter').textContent = `${tutStep + 1} / ${TUTORIAL_STEPS.length}`;
+  document.getElementById('tut-counter').textContent = `${tutStep + 1} / ${effectiveTutSteps.length}`;
   document.getElementById('tut-next-btn').textContent =
-    tutStep >= TUTORIAL_STEPS.length - 1 ? '🚀 Start Playing' : 'Next →';
+    tutStep >= effectiveTutSteps.length - 1 ? '🚀 Start Playing' : 'Next →';
 
   const spot = document.getElementById('tut-spotlight');
   const tip  = document.getElementById('tut-tip');
@@ -1680,7 +1963,19 @@ function showTutStep() {
 
   const pos = step.pos || 'bottom';
   const vw = window.innerWidth, vh = window.innerHeight;
-  if (pos === 'bottom') {
+  const isMobile = vw <= 520;
+  const tipH = 200; // safe height estimate
+  const effTW = isMobile ? vw - 32 : TW;
+  if (isMobile) {
+    // On mobile: always anchor left, position below or above the spotlight
+    tip.style.left = '16px';
+    const belowTop = r.bottom + PAD + 10;
+    if (belowTop + tipH < vh - 8) {
+      tip.style.top = belowTop + 'px';
+    } else {
+      tip.style.top = Math.max(8, r.top - PAD - tipH - 10) + 'px';
+    }
+  } else if (pos === 'bottom') {
     tip.style.top  = (r.bottom + PAD + 10) + 'px';
     tip.style.left = Math.max(8, Math.min(r.left, vw - TW - 8)) + 'px';
   } else if (pos === 'top') {
@@ -1697,7 +1992,7 @@ function showTutStep() {
 
 function tutNext() {
   tutStep++;
-  if (tutStep >= TUTORIAL_STEPS.length) { closeTutorial(); return; }
+  if (tutStep >= effectiveTutSteps.length) { closeTutorial(); return; }
   showTutStep();
 }
 
