@@ -361,6 +361,16 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;m
     background:transparent;border:none;border-top:1px solid #30363d}
   .cat-body.collapsed{display:none}
 
+  /* intro screen: move button + loader directly under subtitle */
+  #screen-intro h1          { order:1 }
+  #screen-intro .intro-subtitle { order:2; margin-bottom:16px }
+  #screen-intro #load-overlay   { order:3; margin-bottom:8px }
+  #screen-intro #load-error     { order:4 }
+  #screen-intro .btn-primary    { order:5; margin-bottom:24px }
+  #screen-intro .intro-body     { order:6 }
+  #screen-intro .intro-features { order:7 }
+  #screen-intro .intro-cite     { order:8 }
+
   /* other screens */
   .intro-features,.intro-features.intro-features-5col{grid-template-columns:1fr}
   .final-indicators{grid-template-columns:repeat(3,1fr)}
